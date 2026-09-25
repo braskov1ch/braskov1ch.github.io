@@ -1,0 +1,3403 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0d0d0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Repack Master</title>
+<style>
+:root{
+  --bg:#0d0d0d;--surface:#161616;--surface2:#1e1e1e;--surface3:#252525;
+  --border:#2a2a2a;--border2:#333;
+  --text:#e8e8e8;--muted:#888;--dim:#666;
+  --accent:#4a8be5;--accent-dim:#2a5a9e;
+  --success:#2ecc71;--warning:#f39c12;--danger:#e74c3c;--purple:#9b59b6;--gold:#f1c40f;--pink:#e91e63;
+  --nav-h:64px;--header-h:56px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --radius:14px;--radius-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  font-size:15px;line-height:1.4;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;
+  user-select:none;-webkit-user-select:none;
+}
+input,textarea{user-select:text;-webkit-user-select:text}
+
+#header{
+  padding-top:var(--safe-top);
+  background:rgba(13,13,13,.92);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:.5px solid var(--border);
+  z-index:50;flex-shrink:0;
+}
+.header-inner{
+  height:var(--header-h);
+  display:flex;align-items:center;padding:0 16px;gap:10px;
+}
+.brand{
+  font-weight:700;font-size:15px;letter-spacing:.5px;
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;
+}
+.header-stats{flex:1;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-right:4px}
+.header-stats::-webkit-scrollbar{display:none}
+.hp{
+  display:flex;align-items:center;gap:4px;
+  background:var(--surface2);border:1px solid var(--border);
+  padding:5px 9px;border-radius:100px;font-size:12px;font-weight:600;
+  white-space:nowrap;flex-shrink:0;
+}
+.hp .ic{font-size:11px;opacity:.7}
+.hp.money{color:var(--success)}
+.hp.rep{color:var(--warning)}
+.hp.lvl{color:var(--accent)}
+.hp.strike{color:var(--danger)}
+
+#main{flex:1;position:relative;overflow:hidden}
+.screen{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:12px;
+  padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 24px);
+  -webkit-overflow-scrolling:touch;
+  display:none;animation:fadeIn .2s ease;
+}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+#nav{
+  position:fixed;left:0;right:0;bottom:0;
+  padding-bottom:var(--safe-bottom);
+  background:rgba(13,13,13,.94);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-top:.5px solid var(--border);
+  display:flex;justify-content:space-around;
+  height:calc(var(--nav-h) + var(--safe-bottom));
+  z-index:60;
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:none;border:none;color:var(--dim);
+  font-size:10px;font-weight:600;cursor:pointer;
+  gap:2px;padding:6px 2px;position:relative;
+  transition:color .15s;min-width:0;
+}
+.nav-btn .ic{font-size:20px;line-height:1}
+.nav-btn .lb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.nav-btn.active{color:var(--accent)}
+.nav-btn:active{transform:scale(.94)}
+.nav-btn .badge{
+  position:absolute;top:6px;right:calc(50% - 18px);
+  background:var(--danger);color:#fff;
+  font-size:9px;min-width:16px;height:16px;
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  padding:0 4px;font-weight:700;
+}
+
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;margin-bottom:10px;
+}
+.card:active{transform:scale(.99);transition:transform .1s}
+.panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:12px;overflow:hidden;
+}
+.panel-h{
+  padding:12px 14px;font-weight:700;font-size:13px;
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  border-bottom:.5px solid var(--border);letter-spacing:.3px;
+}
+.panel-b{padding:14px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 18px;background:var(--accent);color:#fff;
+  border:none;border-radius:12px;font-size:15px;font-weight:600;
+  cursor:pointer;min-height:46px;font-family:inherit;
+  transition:transform .1s,background .15s;
+  -webkit-appearance:none;appearance:none;
+}
+.btn:active{transform:scale(.96);background:#3a7bd5}
+.btn:disabled{background:var(--surface2);color:var(--dim);transform:none}
+.btn-block{width:100%}
+.btn-sm{padding:8px 12px;font-size:13px;min-height:36px;border-radius:10px}
+.btn-success{background:var(--success)}
+.btn-success:active{background:#27ae60}
+.btn-danger{background:var(--danger)}
+.btn-danger:active{background:#c0392b}
+.btn-warn{background:var(--warning);color:#000}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--text)}
+.btn-outline:active{border-color:var(--accent);color:var(--accent)}
+.btn-ghost{background:var(--surface2);color:var(--text)}
+.btn-create-sticky{
+  position:sticky;bottom:12px;margin-top:16px;
+  box-shadow:0 6px 24px rgba(46,204,113,.35),0 4px 12px rgba(0,0,0,.5);
+  z-index:10;
+}
+
+.game-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;margin-bottom:10px;
+  position:relative;overflow:hidden;
+  transition:transform .12s,border-color .15s;
+}
+.game-card:active{transform:scale(.985);border-color:var(--accent)}
+.game-card .gc-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
+.game-card .gc-title{font-weight:700;font-size:16px;line-height:1.25;flex:1}
+.game-card .gc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.game-card .gc-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:12px}
+.game-card .gc-meta .k{color:var(--muted)}
+.game-card .gc-meta .v{color:var(--text);font-weight:600}
+.game-card .gc-footer{display:flex;gap:8px;margin-top:12px}
+.game-card .gc-footer .btn{flex:1}
+
+.tag{
+  display:inline-flex;align-items:center;
+  padding:3px 8px;border-radius:100px;
+  font-size:10px;font-weight:700;letter-spacing:.3px;
+  background:var(--surface3);color:var(--muted);white-space:nowrap;
+}
+.tag.genre{background:rgba(74,139,229,.15);color:#7db3ff}
+.tag.hot{background:rgba(231,76,60,.15);color:#ff8a7d}
+.tag.denuvo{background:rgba(231,76,60,.2);color:#ff6b6b}
+.tag.steam{background:rgba(102,192,244,.15);color:#66c0f4}
+.tag.gold{background:rgba(241,196,15,.15);color:#f1c40f}
+.tag.success{background:rgba(46,204,113,.15);color:#7dffa5}
+.tag.dead{background:var(--surface2);color:var(--dim)}
+.tag.purple{background:rgba(155,89,182,.15);color:#c39bd3}
+
+.filters-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding:0 -12px 10px;
+  scrollbar-width:none;margin:0 -12px 8px;
+  padding-left:12px;padding-right:12px;
+}
+.filters-scroll::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;padding:8px 14px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:100px;font-size:13px;font-weight:600;
+  color:var(--text);cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  min-height:36px;white-space:nowrap;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip:active{transform:scale(.95)}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:0 12px;margin-bottom:10px;height:44px;
+}
+.search-box input{
+  flex:1;background:none;border:none;color:var(--text);
+  font-size:15px;font-family:inherit;outline:none;min-width:0;
+}
+.search-box .ic{color:var(--muted);font-size:16px}
+
+.opt-group{margin-bottom:16px}
+.opt-group-h{
+  font-size:11px;font-weight:700;color:var(--muted);
+  letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:8px;display:flex;align-items:center;gap:6px;
+}
+.opt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.opt-card{
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:12px;padding:10px 12px;cursor:pointer;transition:all .15s;
+  font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:2px;
+  min-height:56px;justify-content:center;
+}
+.opt-card .lbl{line-height:1.2}
+.opt-card .sub{font-size:10px;color:var(--muted);font-weight:500}
+.opt-card.selected{border-color:var(--accent);background:rgba(74,139,229,.12);color:var(--accent)}
+.opt-card.disabled{opacity:.4;pointer-events:none}
+.opt-card:active{transform:scale(.96)}
+
+.presets-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;
+  margin:0 -12px;padding-left:12px;padding-right:12px;scrollbar-width:none;
+}
+.presets-scroll::-webkit-scrollbar{display:none}
+.preset-btn{
+  flex-shrink:0;background:var(--surface2);border:1.5px solid var(--border);
+  padding:10px 14px;border-radius:12px;cursor:pointer;
+  font-size:12px;font-weight:700;display:flex;flex-direction:column;gap:2px;align-items:flex-start;
+  min-width:120px;
+}
+.preset-btn .desc{font-size:10px;color:var(--muted);font-weight:500}
+.preset-btn:active{transform:scale(.95)}
+.preset-btn.selected{border-color:var(--accent);background:rgba(74,139,229,.12)}
+
+.preview{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;margin-top:14px;
+}
+.prev-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;font-size:13px;gap:10px;border-bottom:.5px solid var(--border);
+}
+.prev-row:last-child{border-bottom:none}
+.prev-row .k{color:var(--muted)}
+.prev-row .v{font-weight:700;text-align:right}
+
+.pbar{height:8px;background:var(--surface3);border-radius:100px;overflow:hidden;margin:6px 0}
+.pfill{height:100%;background:var(--accent);border-radius:100px;transition:width .3s;will-change:width}
+.pfill.g{background:var(--success)}
+.pfill.w{background:var(--warning)}
+.pfill.d{background:var(--danger)}
+
+.list-item{
+  display:flex;justify-content:space-between;gap:10px;
+  padding:12px 0;border-bottom:.5px solid var(--border);align-items:center;
+}
+.list-item:last-child{border-bottom:none}
+.list-item .left{flex:1;min-width:0}
+.list-item .name{font-weight:600;font-size:14px;margin-bottom:2px}
+.list-item .sub{font-size:12px;color:var(--muted)}
+.list-item .right{text-align:right;flex-shrink:0}
+
+.msg{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:12px;margin-bottom:8px;
+}
+.msg.mod{background:rgba(231,76,60,.08);border-color:rgba(231,76,60,.3)}
+.msg-h{display:flex;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:12px;align-items:center;flex-wrap:wrap}
+.msg-user{font-weight:700;color:var(--accent)}
+.msg.mod .msg-user{color:#ff6b6b}
+.msg-time{color:var(--muted);font-size:11px}
+.msg-text{font-size:14px;line-height:1.45}
+.msg-title{font-size:11px;color:var(--muted);margin-bottom:6px}
+.stars{color:var(--warning);letter-spacing:2px;font-size:13px}
+
+.ach{
+  display:flex;gap:12px;align-items:center;
+  padding:12px;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;margin-bottom:8px;
+}
+.ach.locked{opacity:.4}
+.ach .ic{font-size:28px;flex-shrink:0}
+.ach .info{flex:1;min-width:0}
+.ach .nm{font-weight:700;font-size:14px;margin-bottom:2px}
+.ach .ds{font-size:11px;color:var(--muted);line-height:1.3}
+
+.quest{
+  border-left:3px solid var(--accent);
+  background:var(--surface);border-radius:12px;
+  padding:14px;margin-bottom:10px;
+  border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.quest.done{border-left-color:var(--success)}
+.quest .nm{font-weight:700;font-size:14px;margin-bottom:2px}
+.quest .ds{font-size:12px;color:var(--muted);margin-bottom:8px}
+
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:14px;text-align:center;
+}
+.stat .n{font-size:22px;font-weight:800;color:var(--accent);line-height:1}
+.stat .l{font-size:11px;color:var(--muted);margin-top:6px;font-weight:500}
+
+.prof-row{
+  display:flex;justify-content:space-between;
+  padding:11px 0;border-bottom:.5px solid var(--border);
+  font-size:14px;gap:12px;
+}
+.prof-row:last-child{border-bottom:none}
+.prof-row .k{color:var(--muted)}
+.prof-row .v{font-weight:600;text-align:right}
+
+.sheet-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.sheet-bg.show{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;
+  background:var(--surface);
+  border-top-left-radius:22px;border-top-right-radius:22px;
+  z-index:101;max-height:88vh;display:flex;flex-direction:column;
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.32,.72,0,1);
+  padding-bottom:var(--safe-bottom);will-change:transform;
+}
+.sheet.show{transform:translateY(0)}
+.sheet-handle{width:40px;height:5px;background:var(--border2);border-radius:100px;margin:10px auto 0;flex-shrink:0}
+.sheet-h{
+  padding:14px 18px;font-weight:700;font-size:16px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-shrink:0;
+}
+.sheet-h .close{
+  background:var(--surface3);border:none;color:var(--text);
+  width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-family:inherit;
+}
+.sheet-b{padding:0 18px 18px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.sheet-f{
+  padding:12px 18px calc(12px + var(--safe-bottom));
+  display:flex;gap:8px;flex-shrink:0;border-top:.5px solid var(--border);
+}
+.sheet-f .btn{flex:1}
+
+#toasts{
+  position:fixed;top:calc(var(--safe-top) + var(--header-h) + 10px);
+  left:12px;right:12px;z-index:90;
+  display:flex;flex-direction:column;gap:6px;pointer-events:none;
+  max-height:40vh;overflow:hidden;
+}
+.toast{
+  background:var(--surface3);border:1px solid var(--border2);
+  border-left:4px solid var(--accent);
+  padding:11px 14px;border-radius:12px;font-size:13px;font-weight:500;
+  box-shadow:0 6px 20px rgba(0,0,0,.5);animation:slideDown .3s ease;
+  pointer-events:auto;cursor:pointer;
+}
+.toast.success{border-left-color:var(--success)}
+.toast.warning{border-left-color:var(--warning)}
+.toast.danger{border-left-color:var(--danger)}
+.toast.gold{border-left-color:var(--gold)}
+.toast.purple{border-left-color:var(--purple)}
+@keyframes slideDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .ic{font-size:52px;margin-bottom:14px;opacity:.4}
+.empty .tx{font-size:14px;line-height:1.5}
+
+.trk{
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;
+}
+.trk.selected{border-color:var(--accent);background:rgba(74,139,229,.1)}
+.trk:active{transform:scale(.97)}
+.trk .nm{font-weight:700;font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.trk .bns{font-size:11px;color:var(--success);margin-bottom:4px}
+.trk .rl{font-size:10px;color:var(--muted);line-height:1.4}
+
+.grp{
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:12px;padding:12px;cursor:pointer;
+}
+.grp.selected{border-color:var(--accent);background:rgba(74,139,229,.1)}
+.grp:active{transform:scale(.97)}
+.grp .nm{font-weight:700;font-size:13px;margin-bottom:4px}
+.grp .ds{font-size:11px;color:var(--muted)}
+
+.shop-it{
+  display:flex;justify-content:space-between;gap:10px;
+  padding:14px;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;margin-bottom:8px;align-items:center;
+}
+.shop-it .info{flex:1;min-width:0}
+.shop-it .nm{font-weight:700;font-size:14px;margin-bottom:3px}
+.shop-it .ds{font-size:11px;color:var(--muted);line-height:1.3}
+.shop-it .price{color:var(--success);font-weight:700;font-size:14px;white-space:nowrap}
+
+.sim{display:flex;flex-direction:column;gap:14px;padding:6px 0}
+.sim-step .lbl{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px}
+.sim-step .lbl .p{color:var(--accent)}
+
+.tt{
+  display:flex;flex-direction:column;align-items:center;
+  gap:2px;background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:10px;padding:8px 4px;cursor:pointer;
+  font-size:10px;font-weight:600;min-height:52px;justify-content:center;
+}
+.tt .ic{font-size:16px}
+.tt.selected{border-color:var(--accent);background:rgba(74,139,229,.12)}
+.tt:active{transform:scale(.94)}
+
+.title-input{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border);
+  color:var(--text);padding:12px 14px;border-radius:12px;
+  font-size:15px;font-family:inherit;outline:none;transition:border-color .15s;
+}
+.title-input:focus{border-color:var(--accent)}
+
+.muted{color:var(--muted)}.success{color:var(--success)}.warning{color:var(--warning)}
+.danger{color:var(--danger)}.purple{color:var(--purple)}.gold{color:var(--gold)}
+.bold{font-weight:700}.center{text-align:center}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}
+.flex{display:flex;gap:8px;align-items:center}.flex-1{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+
+/* ==== CHARACTER CREATION ==== */
+#char-create{
+  position:fixed;inset:0;background:var(--bg);z-index:1100;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;gap:16px;overflow-y:auto;
+}
+#char-create.gone{display:none}
+.char-logo{
+  font-size:26px;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(135deg,var(--accent),var(--purple),var(--pink));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:8px;
+}
+.char-card{
+  width:100%;max-width:360px;background:var(--surface);
+  border:1px solid var(--border);border-radius:18px;padding:24px;
+}
+.char-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase}
+.char-hint{font-size:11px;color:var(--dim);margin-top:6px;line-height:1.4}
+
+/* ==== SITE ==== */
+.site-preview{
+  background:linear-gradient(145deg,#1a1a2e,#16213e);
+  border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;
+}
+.site-url{font-family:monospace;font-size:13px;color:var(--accent);margin-bottom:8px}
+.site-stat-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+
+/* ==== EVENT LOG ==== */
+.event-item{
+  padding:10px 0;border-bottom:.5px solid var(--border);font-size:13px;
+}
+.event-item:last-child{border-bottom:none}
+.event-time{font-size:11px;color:var(--muted)}
+
+/* ==== SPARKLINE ==== */
+.spark{display:flex;align-items:flex-end;gap:2px;height:28px;margin-top:8px}
+.spark span{flex:1;background:var(--accent);border-radius:2px 2px 0 0;opacity:.7;min-width:3px}
+
+/* ==== TOGGLE ==== */
+.toggle-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:.5px solid var(--border);
+}
+.toggle-row:last-child{border-bottom:none}
+.toggle{
+  width:48px;height:28px;background:var(--surface3);border-radius:14px;
+  position:relative;cursor:pointer;transition:background .2s;border:none;
+}
+.toggle.on{background:var(--accent)}
+.toggle::after{
+  content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;
+  background:#fff;border-radius:50%;transition:transform .2s;
+}
+.toggle.on::after{transform:translateX(20px)}
+
+#splash{
+  position:fixed;inset:0;background:var(--bg);z-index:1000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;transition:opacity .3s;
+}
+#splash.gone{opacity:0;pointer-events:none}
+#splash .logo{
+  font-size:28px;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(135deg,var(--accent),var(--purple),var(--pink));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+#splash .sub{color:var(--muted);font-size:13px}
+.spinner{
+  width:32px;height:32px;border:3px solid var(--border2);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:375px){
+  .opt-grid{grid-template-columns:1fr}
+  .game-card .gc-meta{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="logo">REPACK MASTER</div>
+  <div class="spinner"></div>
+  <div class="sub">Загрузка сцены...</div>
+</div>
+
+<!-- CHARACTER CREATION -->
+<div id="char-create" class="gone">
+  <div class="char-logo">REPACK MASTER</div>
+  <div class="char-card">
+    <div style="text-align:center;margin-bottom:20px;font-size:15px;color:var(--muted)">Создай свою студию</div>
+    <div class="char-label">Твой ник</div>
+    <input type="text" class="title-input" id="input-nick" placeholder="Например: DarkSeeder" maxlength="20" autocomplete="off">
+    <div class="char-hint">Будет отображаться в отзывах и ленте</div>
+    <div class="char-label" style="margin-top:18px">Название R.G. / Группы</div>
+    <input type="text" class="title-input" id="input-rg" placeholder="Например: R.G. Phoenix" maxlength="24" autocomplete="off">
+    <div class="char-hint">Твой бренд. Будет в названиях репаков: [R.G. Phoenix] Game...</div>
+    <button class="btn btn-success btn-block mt16" id="btn-start-game">🚀 НАЧАТЬ КАРЬЕРУ</button>
+  </div>
+</div>
+
+<div id="header">
+  <div class="header-inner">
+    <div class="brand" id="h-brand">REPACK</div>
+    <div class="header-stats">
+      <div class="hp money"><span class="ic">💵</span><span id="h-money">0</span></div>
+      <div class="hp rep"><span class="ic">⭐</span><span id="h-rep">15</span></div>
+      <div class="hp lvl"><span class="ic">🎖</span><span id="h-lvl">1</span></div>
+      <div class="hp strike"><span class="ic">⚖️</span><span id="h-str">0/3</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <div class="screen active" id="scr-catalog">
+    <div class="search-box">
+      <span class="ic">🔍</span>
+      <input type="text" id="f-search" placeholder="Поиск игры...">
+    </div>
+    <div class="filters-scroll" id="filters"></div>
+    <div id="catalog-list"></div>
+  </div>
+
+  <div class="screen" id="scr-build">
+    <div id="build-empty" class="empty">
+      <div class="ic">🎮</div>
+      <div class="tx">Выбери игру в каталоге,<br>чтобы начать сборку</div>
+    </div>
+    <div id="build-form" style="display:none"></div>
+  </div>
+
+  <div class="screen" id="scr-myrepacks">
+    <div class="panel"><div class="panel-h">📦 Мои репаки</div><div class="panel-b" id="list-myrepacks"></div></div>
+  </div>
+
+  <div class="screen" id="scr-dists">
+    <div class="panel"><div class="panel-h">📡 Активные раздачи</div><div class="panel-b" id="list-dists"></div></div>
+  </div>
+
+  <div class="screen" id="scr-quests">
+    <div class="panel"><div class="panel-h">📋 Задания на сегодня <span class="muted" style="font-size:11px" id="quest-date"></span></div><div class="panel-b" id="list-quests"></div></div>
+  </div>
+
+  <div class="screen" id="scr-ach">
+    <div class="panel"><div class="panel-h">🏆 Достижения <span class="muted" id="ach-count" style="font-size:11px"></span></div><div class="panel-b" id="list-ach"></div></div>
+  </div>
+
+  <div class="screen" id="scr-feed">
+    <div class="panel"><div class="panel-h">🌐 Лента сцены</div><div class="panel-b" id="list-feed"></div></div>
+  </div>
+
+  <div class="screen" id="scr-comments">
+    <div class="panel"><div class="panel-h">💬 Комментарии</div><div class="panel-b" id="list-comments"></div></div>
+  </div>
+
+  <div class="screen" id="scr-reviews">
+    <div class="panel"><div class="panel-h">⭐ Отзывы</div><div class="panel-b" id="list-reviews"></div></div>
+  </div>
+
+  <div class="screen" id="scr-stats">
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="panel mt12"><div class="panel-h">📊 По репакам</div><div class="panel-b" id="list-stats"></div></div>
+  </div>
+
+  <div class="screen" id="scr-scene">
+    <div class="panel"><div class="panel-h">🎭 Моя группа</div><div class="panel-b" id="my-group"></div></div>
+    <div class="panel"><div class="panel-h">🥊 Конкуренты</div><div class="panel-b" id="list-rivals"></div></div>
+  </div>
+
+  <div class="screen" id="scr-shop">
+    <div class="panel"><div class="panel-h">🛒 Магазин</div><div class="panel-b" id="list-shop"></div></div>
+  </div>
+
+  <div class="screen" id="scr-site">
+    <div id="site-content"></div>
+  </div>
+
+  <div class="screen" id="scr-tablet">
+    <div id="tablet-content"></div>
+  </div>
+
+  <div class="screen" id="scr-darkops">
+    <div id="darkops-content"></div>
+  </div>
+
+  <div class="screen" id="scr-finance">
+    <div id="finance-content"></div>
+  </div>
+
+  <div class="screen" id="scr-log">
+    <div class="panel"><div class="panel-h">📜 Журнал событий</div><div class="panel-b" id="list-log"></div></div>
+  </div>
+
+  <div class="screen" id="scr-profile">
+    <div class="panel"><div class="panel-h">👤 Профиль</div><div class="panel-b" id="profile-body"></div></div>
+    <div class="panel"><div class="panel-h">⚙️ Настройки</div><div class="panel-b" id="settings-body"></div></div>
+    <div class="panel"><div class="panel-h">💾 Управление</div><div class="panel-b">
+      <button class="btn btn-outline btn-block mb8" data-action="save">💾 Сохранить</button>
+      <button class="btn btn-outline btn-block mb8" data-action="load">📂 Загрузить</button>
+      <button class="btn btn-outline btn-block mb8" data-action="export-save">📤 Экспорт сохранения</button>
+      <label class="btn btn-outline btn-block mb8" style="cursor:pointer;margin:0" for="import-file">📥 Импорт сохранения</label>
+      <button class="btn btn-danger btn-block" data-action="reset">🗑 Сбросить прогресс</button>
+    </div></div>
+  </div>
+</div>
+
+<nav id="nav">
+  <button class="nav-btn active" data-tab="catalog"><span class="ic">🎮</span><span class="lb">Игры</span></button>
+  <button class="nav-btn" data-tab="build"><span class="ic">🛠</span><span class="lb">Сборка</span></button>
+  <button class="nav-btn" data-tab="dists"><span class="ic">📡</span><span class="lb">Раздачи</span></button>
+  <button class="nav-btn" data-tab="quests"><span class="ic">📋</span><span class="lb">Задания</span><span class="badge" id="badge-quest" style="display:none">0</span></button>
+  <button class="nav-btn" data-tab="more"><span class="ic">⋯</span><span class="lb">Ещё</span></button>
+</nav>
+
+<div class="sheet-bg" id="sheet-bg"></div>
+
+<div class="sheet" id="sheet-more">
+  <div class="sheet-handle"></div>
+  <div class="sheet-h">Меню</div>
+  <div class="sheet-b" id="sheet-more-body"></div>
+</div>
+
+<div class="sheet" id="sheet-sim">
+  <div class="sheet-handle"></div>
+  <div class="sheet-h">Сборка репака</div>
+  <div class="sheet-b" id="sheet-sim-body"></div>
+  <div class="sheet-f" id="sheet-sim-footer" style="display:none"><button class="btn btn-success btn-block" data-action="sim-done">ГОТОВО</button></div>
+</div>
+
+<div class="sheet" id="sheet-publish">
+  <div class="sheet-handle"></div>
+  <div class="sheet-h">Публикация <button class="close" data-action="close-sheet">✕</button></div>
+  <div class="sheet-b" id="sheet-pub-body"></div>
+  <div class="sheet-f">
+    <button class="btn btn-outline" data-action="close-sheet">Отмена</button>
+    <button class="btn btn-success" data-action="confirm-publish">Опубликовать</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet-dmca">
+  <div class="sheet-handle"></div>
+  <div class="sheet-h">⚠️ DMCA-страйк</div>
+  <div class="sheet-b" id="sheet-dmca-body"></div>
+  <div class="sheet-f" id="sheet-dmca-footer"></div>
+</div>
+
+<div class="sheet" id="sheet-confirm">
+  <div class="sheet-handle"></div>
+  <div class="sheet-h" id="confirm-title">Подтверждение</div>
+  <div class="sheet-b" id="confirm-body"></div>
+  <div class="sheet-f">
+    <button class="btn btn-outline" data-action="close-sheet">Отмена</button>
+    <button class="btn btn-danger" id="confirm-ok">Подтвердить</button>
+  </div>
+</div>
+
+<input type="file" id="import-file" accept=".json,application/json,text/plain,*/*" style="position:fixed;left:-9999px;width:1px;height:1px;opacity:0">
+
+<div id="toasts"></div>
+
+<script>
+(function(){
+"use strict";
+
+setTimeout(function(){
+  var s=document.getElementById("splash");
+  if(s){s.classList.add("gone");setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},400);}
+},700);
+
+function vib(p){if(!state.settings.vibrate)return;if(navigator.vibrate){try{navigator.vibrate(p);}catch(e){}}}
+function vibTap(){vib(8);}
+function vibSuccess(){vib([15,30,15]);}
+function vibError(){vib([40,40,40]);}
+function vibGold(){vib([20,40,20,40,20]);}
+
+var audioCtx=null;
+function beep(freq,dur,type,vol){
+  if(!state.settings.sound)return;
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    var osc=audioCtx.createOscillator();
+    var gain=audioCtx.createGain();
+    osc.type=type||"sine";
+    osc.frequency.value=freq;
+    gain.gain.value=vol||.05;
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+(dur||.08));
+    osc.stop(audioCtx.currentTime+(dur||.08));
+  }catch(e){}
+}
+function sndTap(){beep(600,.03,"square",.03);}
+function sndOk(){beep(660,.06,"sine",.05);setTimeout(function(){beep(880,.09,"sine",.05);},50);}
+function sndMoney(){beep(1200,.04,"sine",.05);setTimeout(function(){beep(1600,.07,"sine",.05);},40);}
+function sndBad(){beep(180,.12,"sawtooth",.05);}
+function sndWin(){[660,880,1100].forEach(function(f,i){setTimeout(function(){beep(f,.09,"sine",.06);},i*80);});}
+
+/* ============================================================
+   DATA
+   ============================================================ */
+var GAMES=[
+{id:1,name:"Undertale",genre:"RPG",year:2015,size:.2,pop:92,diff:1,baseDl:200000,license:40,denuvo:false,steam:true},
+{id:2,name:"Terraria",genre:"Sandbox",year:2011,size:.5,pop:90,diff:1,baseDl:180000,license:35,denuvo:false,steam:true},
+{id:3,name:"Stardew Valley",genre:"Simulation",year:2016,size:1.5,pop:94,diff:1,baseDl:250000,license:45,denuvo:false,steam:true},
+{id:4,name:"Hollow Knight",genre:"Metroidvania",year:2017,size:9,pop:93,diff:1,baseDl:220000,license:55,denuvo:false,steam:true},
+{id:5,name:"Celeste",genre:"Platformer",year:2018,size:1.2,pop:89,diff:1,baseDl:140000,license:40,denuvo:false,steam:true},
+{id:6,name:"Hades",genre:"Roguelike",year:2020,size:15,pop:93,diff:1,baseDl:200000,license:75,denuvo:false,steam:true},
+{id:7,name:"Dead Cells",genre:"Roguelike",year:2018,size:1,pop:87,diff:1,baseDl:130000,license:35,denuvo:false,steam:true},
+{id:8,name:"Cuphead",genre:"Platformer",year:2017,size:4,pop:88,diff:1,baseDl:150000,license:50,denuvo:false,steam:true},
+{id:9,name:"Slay the Spire",genre:"Card",year:2019,size:1,pop:88,diff:1,baseDl:140000,license:40,denuvo:false,steam:true},
+{id:10,name:"Vampire Survivors",genre:"Roguelike",year:2022,size:.4,pop:87,diff:1,baseDl:160000,license:40,denuvo:false,steam:true},
+{id:11,name:"Balatro",genre:"Card",year:2024,size:.2,pop:91,diff:1,baseDl:190000,license:50,denuvo:false,steam:true},
+{id:12,name:"Lethal Company",genre:"Co-op",year:2023,size:3,pop:87,diff:1,baseDl:180000,license:55,denuvo:false,steam:true},
+{id:13,name:"Outer Wilds",genre:"Adventure",year:2019,size:8,pop:86,diff:1,baseDl:120000,license:50,denuvo:false,steam:true},
+{id:14,name:"Ori and the Will of the Wisps",genre:"Platformer",year:2020,size:12,pop:90,diff:1,baseDl:160000,license:65,denuvo:false,steam:true},
+{id:15,name:"Minecraft (Java)",genre:"Sandbox",year:2011,size:1,pop:97,diff:1,baseDl:450000,license:60,denuvo:false,steam:false},
+{id:16,name:"Portal 2",genre:"Puzzle",year:2011,size:12,pop:93,diff:1,baseDl:220000,license:40,denuvo:false,steam:true},
+{id:17,name:"Half-Life 2",genre:"Shooter",year:2004,size:6,pop:92,diff:1,baseDl:180000,license:35,denuvo:false,steam:true},
+{id:18,name:"Left 4 Dead 2",genre:"Shooter",year:2009,size:15,pop:88,diff:1,baseDl:160000,license:40,denuvo:false,steam:true},
+{id:19,name:"Counter-Strike 2",genre:"Shooter",year:2023,size:30,pop:92,diff:2,baseDl:500000,license:60,denuvo:false,steam:true},
+{id:20,name:"Apex Legends",genre:"Shooter",year:2019,size:60,pop:87,diff:2,baseDl:400000,license:60,denuvo:false,steam:true},
+{id:21,name:"Dishonored",genre:"Stealth",year:2012,size:9,pop:88,diff:1,baseDl:120000,license:45,denuvo:false,steam:true},
+{id:22,name:"BioShock Infinite",genre:"Shooter",year:2013,size:30,pop:87,diff:2,baseDl:130000,license:80,denuvo:false,steam:true},
+{id:23,name:"The Elder Scrolls V: Skyrim",genre:"RPG",year:2011,size:15,pop:95,diff:1,baseDl:380000,license:70,denuvo:false,steam:true},
+{id:24,name:"Fallout: New Vegas",genre:"RPG",year:2010,size:10,pop:92,diff:1,baseDl:200000,license:50,denuvo:false,steam:true},
+{id:25,name:"Fallout 4",genre:"RPG",year:2015,size:35,pop:90,diff:2,baseDl:220000,license:90,denuvo:false,steam:true},
+{id:26,name:"The Witcher 3: Wild Hunt",genre:"RPG",year:2015,size:50,pop:96,diff:2,baseDl:350000,license:150,denuvo:false,steam:true},
+{id:27,name:"Cyberpunk 2077",genre:"RPG",year:2020,size:70,pop:92,diff:3,baseDl:350000,license:200,denuvo:false,steam:true},
+{id:28,name:"Dark Souls III",genre:"RPG",year:2016,size:25,pop:89,diff:2,baseDl:180000,license:100,denuvo:false,steam:true},
+{id:29,name:"Sekiro: Shadows Die Twice",genre:"Action",year:2019,size:15,pop:88,diff:2,baseDl:160000,license:110,denuvo:true,steam:true},
+{id:30,name:"Elden Ring",genre:"RPG",year:2022,size:60,pop:95,diff:3,baseDl:340000,license:250,denuvo:false,steam:true},
+{id:31,name:"NieR: Automata",genre:"Action",year:2017,size:50,pop:88,diff:2,baseDl:170000,license:120,denuvo:false,steam:true},
+{id:32,name:"Monster Hunter: World",genre:"Action",year:2018,size:50,pop:87,diff:2,baseDl:180000,license:140,denuvo:true,steam:true},
+{id:33,name:"Resident Evil 2 Remake",genre:"Horror",year:2019,size:26,pop:90,diff:2,baseDl:190000,license:110,denuvo:true,steam:true},
+{id:34,name:"Resident Evil 4 Remake",genre:"Horror",year:2023,size:60,pop:91,diff:3,baseDl:220000,license:180,denuvo:true,steam:true},
+{id:35,name:"Devil May Cry 5",genre:"Action",year:2019,size:35,pop:86,diff:2,baseDl:140000,license:100,denuvo:true,steam:true},
+{id:36,name:"Control",genre:"Action",year:2019,size:42,pop:82,diff:2,baseDl:120000,license:120,denuvo:false,steam:true},
+{id:37,name:"Alan Wake 2",genre:"Horror",year:2023,size:90,pop:87,diff:3,baseDl:200000,license:250,denuvo:false,steam:true},
+{id:38,name:"Detroit: Become Human",genre:"Adventure",year:2018,size:55,pop:87,diff:2,baseDl:150000,license:130,denuvo:true,steam:true},
+{id:39,name:"It Takes Two",genre:"Co-op",year:2021,size:45,pop:89,diff:1,baseDl:170000,license:90,denuvo:true,steam:true},
+{id:40,name:"Prey",genre:"Shooter",year:2017,size:40,pop:85,diff:2,baseDl:120000,license:100,denuvo:true,steam:true},
+{id:41,name:"Baldur's Gate 3",genre:"RPG",year:2023,size:122,pop:96,diff:3,baseDl:380000,license:350,denuvo:false,steam:true},
+{id:42,name:"Divinity: Original Sin 2",genre:"RPG",year:2017,size:60,pop:91,diff:2,baseDl:180000,license:150,denuvo:false,steam:true},
+{id:43,name:"Disco Elysium",genre:"RPG",year:2019,size:18,pop:88,diff:1,baseDl:130000,license:90,denuvo:false,steam:true},
+{id:44,name:"Persona 5 Royal",genre:"RPG",year:2022,size:40,pop:92,diff:2,baseDl:200000,license:180,denuvo:true,steam:true},
+{id:45,name:"Ghost of Tsushima",genre:"Action",year:2024,size:75,pop:92,diff:3,baseDl:240000,license:200,denuvo:false,steam:true},
+{id:46,name:"God of War",genre:"Action",year:2022,size:78,pop:93,diff:3,baseDl:260000,license:220,denuvo:false,steam:true},
+{id:47,name:"God of War Ragnarök",genre:"Action",year:2024,size:120,pop:94,diff:3,baseDl:300000,license:280,denuvo:true,steam:true},
+{id:48,name:"Marvel's Spider-Man Remastered",genre:"Action",year:2022,size:75,pop:91,diff:3,baseDl:240000,license:210,denuvo:false,steam:true},
+{id:49,name:"Marvel's Spider-Man 2",genre:"Action",year:2024,size:100,pop:90,diff:3,baseDl:250000,license:260,denuvo:true,steam:true},
+{id:50,name:"The Last of Us Part I",genre:"Action",year:2023,size:80,pop:90,diff:3,baseDl:240000,license:230,denuvo:false,steam:true},
+{id:51,name:"The Last of Us Part II Remastered",genre:"Action",year:2024,size:100,pop:91,diff:3,baseDl:270000,license:280,denuvo:true,steam:true},
+{id:52,name:"Uncharted: Legacy of Thieves",genre:"Action",year:2022,size:90,pop:88,diff:3,baseDl:200000,license:200,denuvo:false,steam:true},
+{id:53,name:"Horizon Zero Dawn",genre:"Action",year:2017,size:68,pop:90,diff:2,baseDl:200000,license:170,denuvo:false,steam:true},
+{id:54,name:"Horizon Forbidden West",genre:"Action",year:2024,size:120,pop:91,diff:3,baseDl:240000,license:280,denuvo:false,steam:true},
+{id:55,name:"Days Gone",genre:"Action",year:2021,size:70,pop:87,diff:2,baseDl:170000,license:160,denuvo:false,steam:true},
+{id:56,name:"Death Stranding",genre:"Adventure",year:2019,size:64,pop:82,diff:2,baseDl:110000,license:130,denuvo:false,steam:true},
+{id:57,name:"Returnal",genre:"Action",year:2023,size:60,pop:84,diff:3,baseDl:130000,license:200,denuvo:false,steam:true},
+{id:58,name:"Ratchet & Clank: Rift Apart",genre:"Platformer",year:2023,size:50,pop:85,diff:2,baseDl:140000,license:200,denuvo:false,steam:true},
+{id:59,name:"Grand Theft Auto: San Andreas",genre:"Action",year:2004,size:4,pop:93,diff:1,baseDl:220000,license:40,denuvo:false,steam:true},
+{id:60,name:"Grand Theft Auto IV",genre:"Action",year:2008,size:22,pop:88,diff:1,baseDl:180000,license:60,denuvo:false,steam:true},
+{id:61,name:"Grand Theft Auto V",genre:"Action",year:2013,size:95,pop:98,diff:3,baseDl:500000,license:250,denuvo:false,steam:true},
+{id:62,name:"Red Dead Redemption 2",genre:"Action",year:2018,size:150,pop:96,diff:3,baseDl:420000,license:300,denuvo:true,steam:true},
+{id:63,name:"Mafia: Definitive Edition",genre:"Action",year:2020,size:35,pop:85,diff:2,baseDl:130000,license:100,denuvo:true,steam:true},
+{id:64,name:"Sleeping Dogs: Definitive Edition",genre:"Action",year:2014,size:20,pop:85,diff:1,baseDl:100000,license:50,denuvo:false,steam:true},
+{id:65,name:"Watch Dogs 2",genre:"Action",year:2016,size:30,pop:86,diff:2,baseDl:130000,license:100,denuvo:true,steam:true},
+{id:66,name:"Assassin's Creed II",genre:"Action",year:2009,size:12,pop:91,diff:1,baseDl:150000,license:45,denuvo:false,steam:true},
+{id:67,name:"Assassin's Creed IV: Black Flag",genre:"Action",year:2013,size:25,pop:88,diff:1,baseDl:150000,license:70,denuvo:true,steam:true},
+{id:68,name:"Assassin's Creed Origins",genre:"Action",year:2017,size:70,pop:85,diff:2,baseDl:180000,license:150,denuvo:true,steam:true},
+{id:69,name:"Assassin's Creed Odyssey",genre:"Action",year:2018,size:100,pop:87,diff:3,baseDl:220000,license:180,denuvo:true,steam:true},
+{id:70,name:"Assassin's Creed Valhalla",genre:"Action",year:2020,size:160,pop:84,diff:3,baseDl:200000,license:230,denuvo:true,steam:true},
+{id:71,name:"Far Cry 3",genre:"Shooter",year:2012,size:15,pop:90,diff:1,baseDl:160000,license:55,denuvo:true,steam:true},
+{id:72,name:"Far Cry 5",genre:"Shooter",year:2018,size:60,pop:86,diff:2,baseDl:190000,license:150,denuvo:true,steam:true},
+{id:73,name:"Far Cry 6",genre:"Shooter",year:2021,size:90,pop:82,diff:3,baseDl:180000,license:200,denuvo:true,steam:true},
+{id:74,name:"DOOM Eternal",genre:"Shooter",year:2020,size:80,pop:88,diff:2,baseDl:190000,license:160,denuvo:true,steam:true},
+{id:75,name:"Titanfall 2",genre:"Shooter",year:2016,size:60,pop:89,diff:2,baseDl:180000,license:80,denuvo:false,steam:true},
+{id:76,name:"Star Wars Jedi: Fallen Order",genre:"Action",year:2019,size:55,pop:86,diff:2,baseDl:150000,license:130,denuvo:true,steam:true},
+{id:77,name:"Star Wars Jedi: Survivor",genre:"Action",year:2023,size:130,pop:85,diff:3,baseDl:200000,license:220,denuvo:true,steam:true},
+{id:78,name:"Hogwarts Legacy",genre:"RPG",year:2023,size:85,pop:88,diff:3,baseDl:210000,license:200,denuvo:true,steam:true},
+{id:79,name:"Middle-earth: Shadow of War",genre:"Action",year:2017,size:100,pop:82,diff:3,baseDl:120000,license:150,denuvo:true,steam:true},
+{id:80,name:"Forza Horizon 5",genre:"Racing",year:2021,size:110,pop:90,diff:3,baseDl:230000,license:220,denuvo:true,steam:true},
+{id:81,name:"Need for Speed Heat",genre:"Racing",year:2019,size:50,pop:82,diff:2,baseDl:120000,license:110,denuvo:true,steam:true},
+{id:82,name:"EA Sports FC 24",genre:"Sports",year:2023,size:50,pop:85,diff:2,baseDl:200000,license:180,denuvo:true,steam:true},
+{id:83,name:"NBA 2K24",genre:"Sports",year:2023,size:120,pop:78,diff:3,baseDl:130000,license:200,denuvo:true,steam:true},
+{id:84,name:"Football Manager 2024",genre:"Sports",year:2023,size:10,pop:83,diff:1,baseDl:140000,license:70,denuvo:true,steam:true},
+{id:85,name:"Civilization VI",genre:"Strategy",year:2016,size:25,pop:87,diff:2,baseDl:160000,license:100,denuvo:false,steam:true},
+{id:86,name:"Crusader Kings III",genre:"Strategy",year:2020,size:20,pop:86,diff:2,baseDl:130000,license:150,denuvo:false,steam:true},
+{id:87,name:"Hearts of Iron IV",genre:"Strategy",year:2016,size:15,pop:86,diff:2,baseDl:140000,license:130,denuvo:false,steam:true},
+{id:88,name:"Total War: Warhammer III",genre:"Strategy",year:2022,size:120,pop:85,diff:3,baseDl:150000,license:220,denuvo:false,steam:true},
+{id:89,name:"Age of Empires IV",genre:"Strategy",year:2021,size:50,pop:84,diff:2,baseDl:140000,license:120,denuvo:false,steam:true},
+{id:90,name:"Cities: Skylines",genre:"Simulation",year:2015,size:15,pop:87,diff:1,baseDl:160000,license:70,denuvo:false,steam:true},
+{id:91,name:"Euro Truck Simulator 2",genre:"Simulation",year:2012,size:20,pop:88,diff:1,baseDl:170000,license:65,denuvo:false,steam:true},
+{id:92,name:"Factorio",genre:"Simulation",year:2020,size:3,pop:90,diff:1,baseDl:130000,license:50,denuvo:false,steam:true},
+{id:93,name:"Satisfactory",genre:"Simulation",year:2019,size:30,pop:88,diff:1,baseDl:150000,license:80,denuvo:false,steam:true},
+{id:94,name:"The Sims 4",genre:"Simulation",year:2014,size:40,pop:82,diff:1,baseDl:200000,license:80,denuvo:false,steam:true},
+{id:95,name:"Subnautica",genre:"Survival",year:2018,size:12,pop:89,diff:1,baseDl:160000,license:80,denuvo:false,steam:true},
+{id:96,name:"Valheim",genre:"Survival",year:2021,size:12,pop:87,diff:1,baseDl:170000,license:65,denuvo:false,steam:true},
+{id:97,name:"Rust",genre:"Survival",year:2018,size:30,pop:86,diff:2,baseDl:180000,license:90,denuvo:false,steam:true},
+{id:98,name:"Phasmophobia",genre:"Horror",year:2020,size:14,pop:85,diff:1,baseDl:140000,license:55,denuvo:false,steam:true},
+{id:99,name:"Outlast",genre:"Horror",year:2013,size:6,pop:84,diff:1,baseDl:90000,license:40,denuvo:false,steam:true},
+{id:100,name:"Dead Space (2023)",genre:"Horror",year:2023,size:50,pop:86,diff:2,baseDl:160000,license:180,denuvo:true,steam:true},
+{id:101,name:"Silent Hill 2 Remake",genre:"Horror",year:2024,size:50,pop:86,diff:2,baseDl:180000,license:220,denuvo:false,steam:true},
+{id:102,name:"Yakuza 0",genre:"Action",year:2018,size:30,pop:87,diff:2,baseDl:130000,license:70,denuvo:false,steam:true},
+{id:103,name:"Monster Hunter Rise",genre:"Action",year:2022,size:35,pop:84,diff:2,baseDl:150000,license:160,denuvo:true,steam:true},
+{id:104,name:"Nioh 2",genre:"Action",year:2021,size:85,pop:82,diff:3,baseDl:120000,license:180,denuvo:true,steam:true},
+{id:105,name:"Wo Long: Fallen Dynasty",genre:"Action",year:2023,size:60,pop:78,diff:3,baseDl:100000,license:170,denuvo:false,steam:true},
+{id:106,name:"Lies of P",genre:"Action",year:2023,size:50,pop:84,diff:2,baseDl:150000,license:180,denuvo:true,steam:true},
+{id:107,name:"Stellar Blade",genre:"Action",year:2025,size:70,pop:83,diff:3,baseDl:170000,license:220,denuvo:true,steam:true},
+{id:108,name:"Black Myth: Wukong",genre:"Action",year:2024,size:130,pop:90,diff:3,baseDl:280000,license:280,denuvo:true,steam:true},
+{id:109,name:"Split Fiction",genre:"Co-op",year:2025,size:50,pop:92,diff:2,baseDl:260000,license:200,denuvo:true,steam:true},
+{id:110,name:"Clair Obscur: Expedition 33",genre:"RPG",year:2025,size:45,pop:94,diff:2,baseDl:220000,license:180,denuvo:false,steam:true},
+{id:111,name:"Doom (2016)",genre:"Shooter",year:2016,size:55,pop:90,diff:2,baseDl:200000,license:90,denuvo:false,steam:true},
+{id:112,name:"The Outer Worlds",genre:"RPG",year:2019,size:50,pop:84,diff:2,baseDl:140000,license:110,denuvo:true,steam:true},
+{id:113,name:"No Man's Sky",genre:"Survival",year:2016,size:20,pop:86,diff:2,baseDl:180000,license:80,denuvo:false,steam:true},
+{id:114,name:"Deep Rock Galactic",genre:"Co-op",year:2020,size:8,pop:89,diff:1,baseDl:170000,license:60,denuvo:false,steam:true},
+{id:115,name:"Risk of Rain 2",genre:"Roguelike",year:2020,size:5,pop:88,diff:1,baseDl:160000,license:55,denuvo:false,steam:true},
+{id:116,name:"Palworld",genre:"Survival",year:2024,size:40,pop:88,diff:2,baseDl:280000,license:150,denuvo:false,steam:true},
+{id:117,name:"Helldivers 2",genre:"Co-op",year:2024,size:50,pop:87,diff:2,baseDl:250000,license:160,denuvo:false,steam:true},
+{id:118,name:"Metaphor: ReFantazio",genre:"RPG",year:2024,size:70,pop:89,diff:2,baseDl:180000,license:200,denuvo:true,steam:true},
+{id:119,name:"Indiana Jones and the Great Circle",genre:"Adventure",year:2024,size:90,pop:88,diff:3,baseDl:200000,license:220,denuvo:false,steam:true},
+{id:120,name:"Astro Bot",genre:"Platformer",year:2024,size:25,pop:92,diff:2,baseDl:160000,license:180,denuvo:false,steam:true},
+{id:121,name:"Final Fantasy VII Remake",genre:"RPG",year:2022,size:80,pop:90,diff:3,baseDl:220000,license:200,denuvo:true,steam:true},
+{id:122,name:"Dragon's Dogma 2",genre:"RPG",year:2024,size:70,pop:82,diff:3,baseDl:170000,license:200,denuvo:true,steam:true},
+{id:123,name:"Tekken 8",genre:"Fighting",year:2024,size:80,pop:85,diff:2,baseDl:180000,license:180,denuvo:true,steam:true},
+{id:124,name:"Street Fighter 6",genre:"Fighting",year:2023,size:60,pop:87,diff:2,baseDl:170000,license:160,denuvo:true,steam:true},
+{id:125,name:"Sifu",genre:"Action",year:2022,size:15,pop:86,diff:1,baseDl:140000,license:70,denuvo:false,steam:true},
+{id:126,name:"Hi-Fi Rush",genre:"Action",year:2023,size:20,pop:90,diff:1,baseDl:150000,license:80,denuvo:false,steam:true},
+{id:127,name:"Sea of Thieves",genre:"Adventure",year:2018,size:50,pop:85,diff:2,baseDl:190000,license:100,denuvo:false,steam:true},
+{id:128,name:"Warhammer 40K: Space Marine 2",genre:"Action",year:2024,size:80,pop:88,diff:3,baseDl:210000,license:200,denuvo:false,steam:true},
+{id:129,name:"Frostpunk 2",genre:"Strategy",year:2024,size:25,pop:84,diff:2,baseDl:130000,license:140,denuvo:false,steam:true},
+{id:130,name:"Manor Lords",genre:"Strategy",year:2024,size:15,pop:86,diff:2,baseDl:180000,license:100,denuvo:false,steam:true},
+// ---- SOFTWARE ----
+{id:201,name:"Adobe Photoshop 2024",genre:"Graphics",year:2024,size:4,pop:95,diff:2,baseDl:320000,license:120,denuvo:false,steam:false,type:"software"},
+{id:202,name:"Adobe Premiere Pro 2024",genre:"Video",year:2024,size:3,pop:92,diff:2,baseDl:250000,license:130,denuvo:false,steam:false,type:"software"},
+{id:203,name:"Adobe After Effects 2024",genre:"Video",year:2024,size:3.5,pop:90,diff:2,baseDl:200000,license:130,denuvo:false,steam:false,type:"software"},
+{id:204,name:"Adobe Illustrator 2024",genre:"Graphics",year:2024,size:2.5,pop:91,diff:2,baseDl:220000,license:110,denuvo:false,steam:false,type:"software"},
+{id:205,name:"Autodesk AutoCAD 2025",genre:"CAD",year:2024,size:5,pop:88,diff:3,baseDl:180000,license:200,denuvo:false,steam:false,type:"software"},
+{id:206,name:"Autodesk 3ds Max 2025",genre:"3D",year:2024,size:6,pop:85,diff:3,baseDl:140000,license:180,denuvo:false,steam:false,type:"software"},
+{id:207,name:"Blender (Portable)",genre:"3D",year:2024,size:0.5,pop:93,diff:1,baseDl:150000,license:20,denuvo:false,steam:false,type:"software"},
+{id:208,name:"Cinema 4D 2024",genre:"3D",year:2024,size:4,pop:84,diff:2,baseDl:120000,license:160,denuvo:false,steam:false,type:"software"},
+{id:209,name:"FL Studio 21",genre:"Audio",year:2023,size:1.5,pop:94,diff:1,baseDl:280000,license:90,denuvo:false,steam:false,type:"software"},
+{id:210,name:"Ableton Live 12",genre:"Audio",year:2024,size:2,pop:90,diff:2,baseDl:160000,license:140,denuvo:false,steam:false,type:"software"},
+{id:211,name:"Cubase 13",genre:"Audio",year:2023,size:2,pop:82,diff:2,baseDl:100000,license:150,denuvo:false,steam:false,type:"software"},
+{id:212,name:"Microsoft Office 2024",genre:"Office",year:2024,size:5,pop:96,diff:1,baseDl:400000,license:80,denuvo:false,steam:false,type:"software"},
+{id:213,name:"Microsoft Windows 11 Pro",genre:"OS",year:2021,size:5,pop:97,diff:2,baseDl:500000,license:60,denuvo:false,steam:false,type:"software"},
+{id:214,name:"Windows 10 LTSC",genre:"OS",year:2021,size:4,pop:93,diff:1,baseDl:350000,license:40,denuvo:false,steam:false,type:"software"},
+{id:215,name:"JetBrains IntelliJ IDEA",genre:"Dev",year:2024,size:1.2,pop:88,diff:2,baseDl:140000,license:100,denuvo:false,steam:false,type:"software"},
+{id:216,name:"JetBrains PyCharm Pro",genre:"Dev",year:2024,size:1,pop:87,diff:2,baseDl:130000,license:90,denuvo:false,steam:false,type:"software"},
+{id:217,name:"Visual Studio 2022",genre:"Dev",year:2022,size:8,pop:90,diff:2,baseDl:200000,license:70,denuvo:false,steam:false,type:"software"},
+{id:218,name:"IDA Pro 8",genre:"Dev",year:2023,size:0.4,pop:78,diff:3,baseDl:60000,license:250,denuvo:false,steam:false,type:"software"},
+{id:219,name:"CorelDRAW 2024",genre:"Graphics",year:2024,size:2,pop:80,diff:2,baseDl:110000,license:100,denuvo:false,steam:false,type:"software"},
+{id:220,name:"Affinity Photo 2",genre:"Graphics",year:2023,size:1,pop:85,diff:1,baseDl:120000,license:50,denuvo:false,steam:false,type:"software"},
+{id:221,name:"DaVinci Resolve Studio",genre:"Video",year:2024,size:4,pop:91,diff:2,baseDl:190000,license:110,denuvo:false,steam:false,type:"software"},
+{id:222,name:"Vegas Pro 21",genre:"Video",year:2023,size:1.5,pop:79,diff:1,baseDl:100000,license:80,denuvo:false,steam:false,type:"software"},
+{id:223,name:"Norton 360",genre:"Security",year:2024,size:0.5,pop:70,diff:1,baseDl:90000,license:40,denuvo:false,steam:false,type:"software"},
+{id:224,name:"Kaspersky Total Security",genre:"Security",year:2024,size:0.6,pop:75,diff:1,baseDl:100000,license:45,denuvo:false,steam:false,type:"software"},
+{id:225,name:"CCleaner Professional",genre:"Utility",year:2024,size:0.05,pop:82,diff:1,baseDl:150000,license:25,denuvo:false,steam:false,type:"software"},
+{id:226,name:"WinRAR 7",genre:"Utility",year:2024,size:0.01,pop:98,diff:1,baseDl:450000,license:15,denuvo:false,steam:false,type:"software"},
+{id:227,name:"Total Commander",genre:"Utility",year:2023,size:0.02,pop:88,diff:1,baseDl:120000,license:20,denuvo:false,steam:false,type:"software"},
+{id:228,name:"AIDA64 Extreme",genre:"Utility",year:2024,size:0.05,pop:80,diff:1,baseDl:90000,license:30,denuvo:false,steam:false,type:"software"},
+{id:229,name:"MATLAB R2024",genre:"Science",year:2024,size:8,pop:86,diff:3,baseDl:110000,license:220,denuvo:false,steam:false,type:"software"},
+{id:230,name:"SolidWorks 2024",genre:"CAD",year:2024,size:12,pop:87,diff:3,baseDl:130000,license:250,denuvo:false,steam:false,type:"software"},
+{id:231,name:"SketchUp Pro 2024",genre:"CAD",year:2024,size:1,pop:84,diff:1,baseDl:140000,license:70,denuvo:false,steam:false,type:"software"},
+{id:232,name:"Notion (Offline)",genre:"Office",year:2024,size:0.3,pop:83,diff:1,baseDl:100000,license:40,denuvo:false,steam:false,type:"software"},
+{id:233,name:"Obsidian Sync Unlock",genre:"Office",year:2024,size:0.1,pop:81,diff:1,baseDl:80000,license:30,denuvo:false,steam:false,type:"software"},
+{id:234,name:"Spotify Premium Mod",genre:"Media",year:2024,size:0.2,pop:94,diff:1,baseDl:380000,license:35,denuvo:false,steam:false,type:"software"},
+{id:235,name:"YouTube Premium Mod",genre:"Media",year:2024,size:0.15,pop:93,diff:1,baseDl:350000,license:30,denuvo:false,steam:false,type:"software"}
+];
+
+var TRACKERS=[
+{id:"rutracker",name:"RuTracker",flag:"🇷🇺",reqRu:true,minScreens:3,dmcaRisk:.15,audience:1.2,incomeMult:.8,rules:"Русик обязателен, 3+ скрина",bonus:"+30% к ру-аудитории"},
+{id:"nnm",name:"NNM-Club",flag:"🇷🇺",reqRu:true,minScreens:2,dmcaRisk:.2,audience:.85,incomeMult:.7,rules:"Рус. описание",bonus:"Лояльные модераторы"},
+{id:"cs",name:"CS.RIN.RU",flag:"🇷🇺",reqRu:false,minScreens:1,dmcaRisk:.05,audience:1,incomeMult:1.2,rules:"Свободные правила",bonus:"Идеально для Denuvo"},
+{id:"rutor",name:"Rutor",flag:"🇷🇺",reqRu:true,minScreens:1,dmcaRisk:.25,audience:1.05,incomeMult:.75,rules:"Рус. описание",bonus:"Много нишевых игр"},
+{id:"tapochek",name:"Tapochek",flag:"🇷🇺",reqRu:true,minScreens:2,dmcaRisk:.1,audience:.9,incomeMult:.9,rules:"Закрытый трекер",bonus:"Качественная аудитория"},
+{id:"x1337",name:"1337x",flag:"🌍",reqRu:false,minScreens:2,dmcaRisk:.4,audience:1.35,incomeMult:1,rules:"Англ. описание",bonus:"+20% к AAA"},
+{id:"tpb",name:"Pirate Bay",flag:"🌍",reqRu:false,minScreens:0,dmcaRisk:.5,audience:1.5,incomeMult:.6,rules:"Свободные правила",bonus:"Огромный трафик"},
+{id:"kinozal",name:"Kinozal",flag:"🇷🇺",reqRu:true,minScreens:4,dmcaRisk:.3,audience:.8,incomeMult:1.1,rules:"Строгие правила",bonus:"−50% DMCA"},
+{id:"ygg",name:"YggTorrent",flag:"🇫🇷",reqRu:false,minScreens:2,dmcaRisk:.15,audience:.7,incomeMult:.85,rules:"Франц. описание",bonus:"+40% EU-аудитории"},
+{id:"torrent9",name:"Torrent9",flag:"🇫🇷",reqRu:false,minScreens:1,dmcaRisk:.3,audience:.65,incomeMult:.8,rules:"Франц. описание",bonus:"Быстрая модерация"}
+];
+
+var GROUPS=[
+{id:"solo",name:"Без группы",icon:"🎯",mult:1,incomeCut:0,desc:"Своё имя",unlockLvl:1},
+{id:"xatab",name:"Xatab",icon:"🦂",mult:1.35,incomeCut:.1,desc:"Рус. аудитория",unlockLvl:3},
+{id:"dodi",name:"DODI",icon:"🐉",mult:1.5,incomeCut:.15,desc:"Быстрая установка",unlockLvl:4},
+{id:"fitgirl",name:"FitGirl",icon:"💎",mult:1.7,incomeCut:.15,desc:"Макс. сжатие",unlockLvl:5},
+{id:"mechanics",name:"R.G. Mechanics",icon:"⚙️",mult:1.55,incomeCut:.2,desc:"Полный контент",unlockLvl:5},
+{id:"empress",name:"EMPRESS",icon:"👑",mult:1.9,incomeCut:.25,desc:"Denuvo-легенда",unlockLvl:7}
+];
+
+var RIVALS=[
+{id:"r1",name:"RepackGuru",group:"solo",rep:78,style:"Макс. сжатие"},
+{id:"r2",name:"FastInstaller",group:"dodi",rep:82,style:"Быстрая установка"},
+{id:"r3",name:"RuVoiceMaster",group:"xatab",rep:71,style:"Лучший русик"},
+{id:"r4",name:"FullContent_HD",group:"mechanics",rep:85,style:"Полный контент"},
+{id:"r5",name:"TorrentKing_X",group:"solo",rep:65,style:"Спам релизами"},
+{id:"r6",name:"CompactLord",group:"fitgirl",rep:88,style:"Экстрим-сжатие"},
+{id:"r7",name:"DenuvoSlayer",group:"empress",rep:92,style:"Взлом Denuvo"}
+];
+
+var PRESETS=[
+{id:"fitgirl",name:"💎 FitGirl",desc:"Макс. сжатие + русик",opts:{content:"cut",lang:"ru_text",monet:"none",dlc:"all",comp:"max",tablet:"codex",install:"offline",sys:"all",ui:"fancy"}},
+{id:"xatab",name:"🦂 Xatab",desc:"Рус. озвучка",opts:{content:"cut_intro",lang:"ru_voice",monet:"none",dlc:"all",comp:"normal",tablet:"reloaded",install:"offline",sys:"all",ui:"retro"}},
+{id:"dodi",name:"🐉 DODI",desc:"Быстрая установка",opts:{content:"full",lang:"orig",monet:"none",dlc:"all",comp:"fast",tablet:"codex",install:"offline",sys:"vcredist",ui:"minimal"}},
+{id:"clean",name:"✨ Чисто",desc:"Всё + идеал",opts:{content:"full",lang:"ru_voice",monet:"none",dlc:"all",comp:"normal",tablet:"goldberg",install:"offline",sys:"all",ui:"fancy"}},
+{id:"spam",name:"💀 Спам",desc:"Быстро, с рекламой",opts:{content:"max_cut",lang:"orig",monet:"sponsor",dlc:"none",comp:"fast",tablet:"skidrow",install:"offline",sys:"none",ui:"minimal"}}
+];
+
+var OPTIONS={
+content:[
+  {id:"full",label:"Полный контент",sub:"Ничего не режем",size:0,quality:5,appeal:8},
+  {id:"cut_intro",label:"− Интро",sub:"Мелкая вырезка",size:-.05,quality:2,appeal:2},
+  {id:"cut",label:"− Видео/музыка",sub:"Средняя вырезка",size:-.25,quality:-10,install:-.15,appeal:-8},
+  {id:"max_cut",label:"Макс. вырезка",sub:"Только геймплей",size:-.4,quality:-20,install:-.25,appeal:-20}
+],
+lang:[
+  {id:"orig",label:"Оригинал",sub:"Без перевода",size:0,quality:0,appeal:0},
+  {id:"ru_text",label:"Русик текст",sub:"Только субтитры",size:.02,quality:2,install:.02,appeal:15},
+  {id:"ru_voice",label:"Рус. озвучка",sub:"Полный дубляж",size:.08,quality:3,install:.05,appeal:22},
+  {id:"multi",label:"Мультиязык",sub:"5+ языков",size:.15,quality:5,install:.1,appeal:28},
+  {id:"all",label:"Все языки",sub:"Всё что есть",size:.25,quality:6,install:.15,appeal:32}
+],
+monet:[
+  {id:"none",label:"Чисто",sub:"Без денег",size:0,quality:5,income:0,appeal:15,risk:0},
+  {id:"paid",label:"Платные ссылки",sub:"+$0.4/шт",size:0,quality:0,income:.4,appeal:-10,risk:.05},
+  {id:"ads",label:"Реклама",sub:"+$0.5/шт",size:.01,quality:-10,income:.5,appeal:-20,risk:.2},
+  {id:"sponsor",label:"Спонсоры",sub:"+$0.7/шт",size:.03,quality:-15,income:.7,appeal:-30,risk:.35},
+  {id:"crypto",label:"Крипто-майнер",sub:"+$1.5 ⚠️",size:.05,quality:-30,income:1.5,appeal:-60,risk:.9}
+],
+dlc:[
+  {id:"none",label:"Без DLC",sub:"Только база",size:0,quality:0,appeal:-8},
+  {id:"extras",label:"Доп. материалы",sub:"Артбук и пр.",size:.08,quality:3,appeal:10},
+  {id:"all",label:"Все DLC",sub:"Полный набор",size:.2,quality:6,appeal:22}
+],
+comp:[
+  {id:"none",label:"1:1",sub:"Без сжатия",sizeMult:.05,quality:5,installMult:-.4,appeal:5},
+  {id:"fast",label:"Быстро",sub:"−15% размера",sizeMult:-.15,quality:2,installMult:-.2,appeal:3},
+  {id:"normal",label:"Обычное",sub:"−35% размера",sizeMult:-.35,quality:3,installMult:0,appeal:5},
+  {id:"max",label:"Максимум",sub:"−55% размера",sizeMult:-.55,quality:-3,installMult:.5,appeal:8}
+],
+tablet:[
+  {id:"codex",label:"CODEX",icon:"💊",quality:5,appeal:8,stability:5},
+  {id:"reloaded",label:"RELOADED",icon:"💊",quality:5,appeal:6,stability:5},
+  {id:"cpy",label:"CPY",icon:"💊",quality:6,appeal:10,stability:8,denuvoOk:true},
+  {id:"goldberg",label:"Goldberg",icon:"💊",quality:4,appeal:12,stability:6},
+  {id:"onlinefix",label:"Online-Fix",icon:"💊",quality:3,appeal:14,stability:4,online:true},
+  {id:"rune",label:"RUNE",icon:"💊",quality:5,appeal:7,stability:6},
+  {id:"skidrow",label:"SKIDROW",icon:"💊",quality:2,appeal:3,stability:0},
+  {id:"custom",label:"Своя",icon:"⚡",quality:4,appeal:10,stability:5,isCustom:true},
+  {id:"none",label:"Без таблетки",icon:"🚫",quality:-30,appeal:-50,stability:0}
+],
+install:[
+  {id:"offline",label:"Офлайн",sub:"Без интернета",size:-.03,quality:4,appeal:10},
+  {id:"online",label:"Онлайн-фичи",sub:"Кооп и мультик",size:.05,quality:0,appeal:5}
+],
+sys:[
+  {id:"all",label:"DX+VC++.NET",sub:"Полный набор",size:.06,quality:6,install:.06,stability:20},
+  {id:"vcredist",label:"VC++ Redist",sub:"Базовый",size:.02,quality:4,install:.03,stability:10},
+  {id:"dx",label:"DirectX",sub:"Для старых",size:.015,quality:3,install:.02,stability:8},
+  {id:"none",label:"Без компонентов",sub:"Риск вылетов",size:0,quality:-8,stability:-15}
+],
+ui:[
+  {id:"minimal",label:"Минимализм",sub:"Стандарт",quality:2,appeal:5,cost:0},
+  {id:"retro",label:"Ретро",sub:"Как Xatab",quality:3,appeal:8,cost:0},
+  {id:"dark",label:"Тёмная",sub:"Стиль DODI",quality:3,appeal:6,cost:0},
+  {id:"fancy",label:"Арт+анимации",sub:"Премиум (+$50)",quality:5,appeal:12,cost:50}
+],
+extras:[
+  {id:"none",label:"Без бонусов",sub:"Только игра",size:0,quality:0,appeal:0},
+  {id:"saves",label:"Сейвы / профили",sub:"Готовые сохранения",size:.01,quality:1,appeal:6},
+  {id:"trainer",label:"Трейнер",sub:"Читы в комплекте",size:.02,quality:0,appeal:10,risk:.05},
+  {id:"cheats",label:"Трейнер+моды",sub:"Макс. бонусы",size:.05,quality:-2,appeal:14,risk:.1},
+  {id:"ost",label:"OST / артбук",sub:"Музыка и арты",size:.08,quality:3,appeal:12}
+],
+pack:[
+  {id:"installer",label:"Установщик",sub:"Классика",size:0,quality:3,appeal:5,install:0},
+  {id:"silent",label:"Тихая установка",sub:"Без окон",size:0,quality:2,appeal:8,install:-.1},
+  {id:"portable",label:"Portable",sub:"Без установки",size:-.02,quality:4,appeal:12,install:-.5},
+  {id:"iso",label:"ISO-образ",sub:"Как диск",size:.03,quality:2,appeal:3,install:.1}
+],
+audio:[
+  {id:"orig",label:"Оригинал",sub:"Как в игре",size:0,quality:2,appeal:0},
+  {id:"high",label:"Высокое",sub:"Без сжатия аудио",size:.05,quality:4,appeal:5},
+  {id:"compressed",label:"Сжатое",sub:"Меньше размер",size:-.08,quality:-3,appeal:-2,install:-.05}
+],
+fixes:[
+  {id:"none",label:"Без фиксов",sub:"Как есть",stability:0,appeal:0},
+  {id:"basic",label:"Базовые фиксы",sub:"Краши / DLL",stability:8,quality:2,appeal:5},
+  {id:"full",label:"Полный фикс-пак",sub:"Всё что известно",stability:15,quality:4,appeal:10,size:.02},
+  {id:"online_fix",label:"Online-Fix пакет",sub:"Кооп/мультик",stability:5,appeal:12,size:.03}
+]
+};
+
+var SHOP=[
+{id:"ssd",name:"SSD 1TB",desc:"−25% времени сборки",cost:800,effect:{timeMult:.75},reqLvl:1},
+{id:"ram",name:"32 GB RAM",desc:"−15% времени, +1 сложность",cost:1200,effect:{timeMult:.85,maxDiff:1},reqLvl:1},
+{id:"cpu",name:"Мощный CPU",desc:"−30% времени",cost:2500,effect:{timeMult:.7},reqLvl:2},
+{id:"net",name:"Широкий канал",desc:"+30% сидов",cost:1800,effect:{speedMult:1.3},reqLvl:2},
+{id:"sign",name:"Подпись установщика",desc:"−70% ложных AV-срабатываний",cost:3000,effect:{avComplaintMult:.3},reqLvl:2},
+{id:"tools",name:"Pro-сжатие",desc:"+8 качества",cost:3500,effect:{qualityBonus:8},reqLvl:3},
+{id:"server",name:"Сервер",desc:"+20% сидов, −20% времени",cost:5000,effect:{timeMult:.8,seedBonus:.2},reqLvl:3},
+{id:"branding",name:"Брендинг",desc:"+50% к репутации",cost:6500,effect:{repMult:1.5},reqLvl:3},
+{id:"farm",name:"Ферма",desc:"−40% времени, +2 сложности",cost:12000,effect:{timeMult:.6,maxDiff:2},reqLvl:4},
+{id:"av",name:"AV-сканер",desc:"−50% жалоб «вирус»",cost:9000,effect:{avComplaintMult:.5},reqLvl:4},
+{id:"marketing",name:"Маркетинг",desc:"+25% охвата",cost:15000,effect:{reachMult:1.25},reqLvl:5},
+{id:"legal",name:"Юрист",desc:"×2 шанс отбить DMCA",cost:20000,effect:{legalDefense:2},reqLvl:6},
+{id:"empress",name:"Контакты EMPRESS",desc:"+40% к взлому Denuvo",cost:50000,effect:{denuvoBonus:.4},reqLvl:7},
+{id:"ai",name:"AI-помощник",desc:"+15% ко всем DL",cost:80000,effect:{aiBonus:.15},reqLvl:8}
+];
+
+var SITE_UPGRADES=[
+{id:"hosting",name:"Хороший хостинг",desc:"+40% посетителей",cost:2500,effect:{visitors:1.4}},
+{id:"design",name:"Красивый дизайн",desc:"+20% конверсии",cost:1800,effect:{conv:1.2}},
+{id:"seo",name:"SEO-оптимизация",desc:"+50% органики",cost:4000,effect:{visitors:1.5}},
+{id:"cdn",name:"CDN + зеркала",desc:"−60% риска блокировок",cost:6000,effect:{risk:.4}},
+{id:"adsense",name:"Реклама на сайте",desc:"+$0.3 с посетителя",cost:3500,effect:{income:.3}},
+{id:"premium",name:"Премиум-раздел",desc:"+доход от донатов",cost:8000,effect:{income:.5,visitors:1.15}}
+];
+
+var USERS=["DarkSeeder","xXRepackKingXx","SilentDownload","TorrentCat","HDD_Master","LowSpaceGamer","RuVoiceFan","NoAdsPlease","CompactLover","FullISO_Only","SeedHunter99","InstallSpeed","BugFinder_Pro","CasualPirat","SSD_Owner","LangCollector","DLC_Hunter","OfflineMode","OldPC_User","MaxQuality","QuickSetup","VirusCheck","CleanInstall","PeerPower","RepackReviewer","NightDownloader","SaveSpace","MultiLangRU","AntiBloat","StableBuild","TorrentVeteran","RutorFan","TapochekKing","FiftySevenGB"];
+
+var COMMENTS_POOL=[
+{key:"thanks",texts:["Спасибо, качаю!","Автор, ты лучший!","Спасибо за релиз!"],w:6,mod:false},
+{key:"seed_req",texts:["Сид, плиз!","Раздайте кто-нибудь","Ну где сиды?"],w:4,mod:false},
+{key:"no_seeds",texts:["Сидов мало...","Один сид всего","Умерла раздача?"],w:3,mod:false},
+{key:"praise",texts:["Установилось без проблем","Сборка отличная","Качественно сделано"],w:5,mod:false},
+{key:"ru_thanks",texts:["Спасибо за русик!","Русская озвучка топ","Наконец с русским"],w:4,mod:false},
+{key:"bug",texts:["Вылетает через 10 мин","Не запускается, missing DLL","Баг: текстуры пропадают"],w:3,mod:false},
+{key:"av_flag",texts:["Антивирус ругается","Defender удалил экзешник"],w:3,mod:false},
+{key:"mod_ru",texts:["Модератор: нужен русский язык","Модератор: добавьте русификатор"],w:5,mod:true,cond:function(r){return r.tracker.reqRu&&r.opts.lang==="orig";}},
+{key:"mod_scr",texts:["Модератор: нужно N скриншотов","Модератор: скрины не по правилам"],w:6,mod:true,cond:function(r){return r.screenshots<r.tracker.minScreens;}},
+{key:"sponsor_hate",texts:["Уберите спонсоров!","Зачем галочки с мусором?"],w:5,mod:false,cond:function(r){return r.opts.monet==="sponsor";}},
+{key:"crypto_hate",texts:["МАЙНЕР в установщике!","Это вирус! Жалоба!"],w:10,mod:false,cond:function(r){return r.opts.monet==="crypto";}},
+{key:"tablet_love",texts:["Таблетка CODEX надёжная","CPY топ","Goldberg работает"],w:4,mod:false,cond:function(r){return ["codex","reloaded","cpy","goldberg","rune"].indexOf(r.opts.tablet)>=0;}}
+];
+
+var REVIEW_POOL={
+size_good:["Размер {size} ГБ вместо {orig} — отличное сжатие!","Только {size} ГБ, влезло на SSD."],
+quality_high:["Качество {quality}/100 — уровень.","Рука мастера."],
+install_fast:["Установка {install} мин — быстро!","Быстрее чем из Steam."],
+install_slow:["Установка {install} мин — долго.","Ждал дольше чем хотелось."],
+lang_ru:["Спасибо за русскую озвучку!","Русик на месте."],
+dlc_full:["Все DLC в комплекте!","Полный комплект."],
+no_ads:["Чистый установщик.","Спасибо, что без мусора."],
+stable:["Запустилось с первого раза.","Стабильно."],
+offline:["Офлайн-версия — то что нужно.","Работает офлайн."],
+general_pos:["Отличный репак!","Рекомендую.","Всё работает."],
+size_big:["Размер {size} ГБ — мог быть меньше.","Сжатие среднее."],
+cut_content:["Контент вырезали, но компактно.","Не то без вырезанного."],
+seeds_low:["Сидов в начале не было.","Раздача хромала."],
+minor_bugs:["Мелкий баг.","Почти идеально."],
+ads_hate:["Реклама? Минус звезда.","Зачем реклама?"],
+sponsor_hate:["Спонсоры — дно.","Навязанный софт."],
+crypto_hate:["МАЙНЕР! Удаляю!","Это уголовка."],
+no_lang:["Никакого русского.","Только оригинал."],
+crashes:["Вылетает при запуске.","Постоянные краши."],
+no_dlc:["Без DLC.","Базовая версия."],
+bloat:["Много лишнего.","Раздутый установщик."],
+general_neg:["Не рекомендую.","Ожидал большего."]
+};
+
+var ACHIEVEMENTS=[
+{id:"a1",name:"Первый репак",desc:"Опубликуй первую раздачу",icon:"📦",check:function(s){return s.repacks.length>=1;}},
+{id:"a2",name:"Опытный",desc:"10 репаков",icon:"🎯",check:function(s){return s.repacks.length>=10;}},
+{id:"a3",name:"Профи",desc:"50 репаков",icon:"🏆",check:function(s){return s.repacks.length>=50;}},
+{id:"a4",name:"Легенда",desc:"100 репаков",icon:"👑",check:function(s){return s.repacks.length>=100;}},
+{id:"a5",name:"Тысяча",desc:"1K скачиваний",icon:"📈",check:function(s){return s.totalDownloads>=1000;}},
+{id:"a6",name:"100K",desc:"100K скачиваний",icon:"🚀",check:function(s){return s.totalDownloads>=100000;}},
+{id:"a7",name:"Миллионник",desc:"1M скачиваний",icon:"💥",check:function(s){return s.totalDownloads>=1000000;}},
+{id:"a8",name:"Первая касса",desc:"$1 000 заработано",icon:"💵",check:function(s){return s.totalIncome>=1000;}},
+{id:"a9",name:"Богач",desc:"$100 000",icon:"💰",check:function(s){return s.totalIncome>=100000;}},
+{id:"a10",name:"Магнат",desc:"$1 000 000",icon:"🤑",check:function(s){return s.totalIncome>=1000000;}},
+{id:"a11",name:"Первый DMCA",desc:"Получи DMCA",icon:"⚖️",check:function(s){return s.dmcaStrikes>=1;}},
+{id:"a12",name:"FitGirl-ученик",desc:"Вступи в FitGirl",icon:"💎",check:function(s){return s.myGroup==="fitgirl";}},
+{id:"a13",name:"Ученик EMPRESS",desc:"Вступи в EMPRESS",icon:"👑",check:function(s){return s.myGroup==="empress";}},
+{id:"a14",name:"Denuvo сломан",desc:"Взломай первую Denuvo",icon:"🔓",check:function(s){return (s.denuvoWins||0)>=1;}},
+{id:"a15",name:"Denuvo-мастер",desc:"10 Denuvo",icon:"🗝",check:function(s){return (s.denuvoWins||0)>=10;}},
+{id:"a16",name:"Чисто",desc:"10 репаков без монетизации",icon:"✨",check:function(s){var c=0;for(var i=0;i<s.repacks.length;i++)if(s.repacks[i].opts.monet==="none")c++;return c>=10;}},
+{id:"a17",name:"Компакт",desc:"Репак < 500 MB",icon:"🐜",check:function(s){for(var i=0;i<s.repacks.length;i++)if(s.repacks[i].size<0.5)return true;return false;}},
+{id:"a18",name:"Все трекеры",desc:"Публикуй на всех 10",icon:"🌐",check:function(s){var set={};for(var i=0;i<s.repacks.length;i++)set[s.repacks[i].trackerId]=1;for(var k=0;k<TRACKERS.length;k++)if(!set[TRACKERS[k].id])return false;return s.repacks.length>=TRACKERS.length;}},
+{id:"a19",name:"Репутация 90",desc:"Достигни 90 REP",icon:"⭐",check:function(s){return s.rep>=90;}},
+{id:"a20",name:"Уровень 5",desc:"Достигни 5 уровня",icon:"🎖",check:function(s){return s.level>=5;}},
+{id:"a21",name:"Уровень 10",desc:"Достигни 10 уровня",icon:"🏅",check:function(s){return s.level>=10;}},
+{id:"a22",name:"Уровень 20",desc:"Достигни 20 уровня",icon:"🎗",check:function(s){return s.level>=20;}},
+{id:"a23",name:"Исполнитель",desc:"Выполни 10 заданий",icon:"📋",check:function(s){return (s.questsDone||0)>=10;}},
+{id:"a24",name:"Своё имя",desc:"Используй custom title",icon:"✍️",check:function(s){for(var i=0;i<s.repacks.length;i++)if(s.repacks[i].customTitle)return true;return false;}},
+{id:"a25",name:"Таблеточник",desc:"Все виды таблеток",icon:"💊",check:function(s){var set={};for(var i=0;i<s.repacks.length;i++)set[s.repacks[i].opts.tablet]=1;var arr=["codex","reloaded","cpy","goldberg","onlinefix","rune","skidrow"];for(var j=0;j<arr.length;j++)if(!set[arr[j]])return false;return true;}},
+{id:"a26",name:"Грязные деньги",desc:"Крипто-майнер",icon:"☠️",check:function(s){for(var i=0;i<s.repacks.length;i++)if(s.repacks[i].opts.monet==="crypto")return true;return false;}},
+{id:"a27",name:"RU-царь",desc:"20 репаков с рус. озвучкой",icon:"🇷🇺",check:function(s){var c=0;for(var i=0;i<s.repacks.length;i++)if(s.repacks[i].opts.lang==="ru_voice")c++;return c>=20;}},
+{id:"a28",name:"Фанат",desc:"5 репаков одной игры",icon:"🎮",check:function(s){var m={};for(var i=0;i<s.repacks.length;i++){var k=s.repacks[i].gameId;m[k]=(m[k]||0)+1;if(m[k]>=5)return true;}return false;}},
+{id:"a29",name:"Веб-мастер",desc:"Создай свой сайт",icon:"🌐",check:function(s){return s.site&&s.site.created;}},
+{id:"a30",name:"Популярный сайт",desc:"10K посетителей на сайте",icon:"📈",check:function(s){return s.site&&s.site.totalVisitors>=10000;}},
+{id:"a31",name:"Своя таблетка",desc:"Создай собственную таблетку",icon:"⚡",check:function(s){return !!s.customTablet;}},
+{id:"a32",name:"Мульти-релиз",desc:"Опубликуй на 3 трекерах сразу",icon:"📡",check:function(s){var m={};for(var i=0;i<s.repacks.length;i++){var k=s.repacks[i].gameId+"_"+Math.floor(s.repacks[i].publishedAt/10000);m[k]=(m[k]||0)+1;if(m[k]>=3)return true;}return false;}},
+{id:"a33",name:"Кибер-война",desc:"Успешный DDOS",icon:"💥",check:function(s){for(var i=0;i<(s.rivalSites||[]).length;i++)if(s.rivalSites[i].hp<100)return true;return false;}}
+];
+
+var QUESTS=[
+{id:"q1",name:"Три репака",desc:"Опубликуй 3 раздачи",reward:500,target:3,type:"publish"},
+{id:"q2",name:"Русификатор",desc:"2 репака с рус. озвучкой",reward:800,target:2,type:"ru_voice"},
+{id:"q3",name:"Denuvo-вызов",desc:"Взломай игру с Denuvo",reward:1500,target:1,type:"denuvo"},
+{id:"q4",name:"Чистота",desc:"3 репака без монетизации",reward:600,target:3,type:"clean"},
+{id:"q5",name:"Популярность",desc:"10K скачиваний",reward:1000,target:10000,type:"downloads"},
+{id:"q6",name:"Касса",desc:"Заработай $3 000",reward:300,target:3000,type:"income"},
+{id:"q7",name:"Разнообразие",desc:"Используй 3 таблетки",reward:700,target:3,type:"tablets"}
+];
+
+function makeState(){
+  return {
+    nick:"",rgName:"",
+    money:500,rep:15,level:1,xp:0,upgrades:[],
+    repacks:[],reviews:[],comments:[],feed:[],eventLog:[],
+    selectedGame:null,buildOpts:{},pendingRepack:null,
+    publishTrackers:[],publishToSite:false,publishScreenshots:3,publishDesc:"standard",
+    publishMirrors:1,publishFeatured:false,publishCategory:"games",publishNfo:"standard",publishReleaseType:"repack",
+    myGroup:"solo",groupsVisited:["solo"],
+    dmcaStrikes:0,banned:false,
+    totalDownloads:0,totalIncome:0,
+    lastTick:Date.now(),patchTimer:0,
+    achievements:[],questsDone:0,
+    currentQuests:[],questDay:0,questProgress:{},
+    denuvoWins:0,
+    trackerRep:{},
+    site:null,
+    customTablet:null,
+    rivalSites:[
+      {id:"r1",name:"repackguru.to",owner:"RepackGuru",hp:100,downUntil:0},
+      {id:"r2",name:"fastinstall.net",owner:"FastInstaller",hp:100,downUntil:0},
+      {id:"r6",name:"compactlord.repack",owner:"CompactLord",hp:100,downUntil:0},
+      {id:"r7",name:"denuvoslayer.xyz",owner:"DenuvoSlayer",hp:100,downUntil:0}
+    ],
+    loan:null,
+    investments:[],
+    currentEvent:null,
+    settings:{sound:true,vibrate:true},
+    startedAt:Date.now()
+  };
+}
+var state=makeState();
+var currentDmca=null;
+var activeSheet=null;
+var currentGenre="";
+var currentType=""; // "" | "game" | "software"
+var pendingConfirm=null;
+
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function fmt(n){
+  n=Number(n)||0;
+  if(n>=1e6)return (n/1e6).toFixed(1)+"M";
+  if(n>=1e3)return (n/1e3).toFixed(1)+"K";
+  return Math.round(n).toString();
+}
+function toast(msg,type){
+  var el=document.createElement("div");
+  el.className="toast "+(type||"");
+  el.textContent=msg;
+  el.addEventListener("click",function(){if(el.parentNode)el.parentNode.removeChild(el);});
+  var c=document.getElementById("toasts");
+  if(c){
+    // не больше 3 тостов одновременно — чтобы не мешали UI
+    while(c.children.length>=3)c.removeChild(c.firstChild);
+    c.appendChild(el);
+  }
+  vibTap();
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},2800);
+}
+
+function updateSiteStatsLive(){
+  if(!state.site||!state.site.created)return;
+  var root=document.getElementById("site-content");
+  if(!root)return;
+  var rows=root.querySelectorAll(".site-stat-row .bold, .site-stat-row .success");
+  // обновляем только цифры, не трогая инпуты
+  var map=[
+    fmt(state.site.visitors),
+    fmt(state.site.totalVisitors),
+    fmt(state.site.downloads||0),
+    "$"+fmt(Math.round(state.site.income))
+  ];
+  var bolds=root.querySelectorAll(".site-preview .site-stat-row span:last-child");
+  for(var i=0;i<Math.min(4,bolds.length);i++){
+    if(bolds[i]&&!bolds[i].querySelector("input"))bolds[i].textContent=map[i];
+  }
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function timeAgo(ts){
+  var s=Math.floor((Date.now()-ts)/1000);
+  if(s<60)return "только что";
+  if(s<3600)return Math.floor(s/60)+"м";
+  if(s<86400)return Math.floor(s/3600)+"ч";
+  return Math.floor(s/86400)+"д";
+}
+
+function addLog(msg,type){
+  state.eventLog.unshift({msg:msg,time:Date.now(),type:type||""});
+  if(state.eventLog.length>100)state.eventLog.length=100;
+}
+
+function openSheet(id){
+  closeAllSheets();
+  var el=document.getElementById("sheet-"+id);
+  var bg=document.getElementById("sheet-bg");
+  if(!el)return;
+  requestAnimationFrame(function(){bg.classList.add("show");el.classList.add("show");});
+  activeSheet=id;vibTap();
+}
+function closeAllSheets(){
+  var sheets=document.querySelectorAll(".sheet");
+  for(var i=0;i<sheets.length;i++)sheets[i].classList.remove("show");
+  document.getElementById("sheet-bg").classList.remove("show");
+  activeSheet=null;pendingConfirm=null;
+}
+
+function showConfirm(title,body,okText,cb){
+  document.getElementById("confirm-title").textContent=title;
+  document.getElementById("confirm-body").innerHTML=body;
+  var okBtn=document.getElementById("confirm-ok");
+  okBtn.textContent=okText||"Подтвердить";
+  pendingConfirm=cb;
+  openSheet("confirm");
+}
+
+function init(){
+  try{loadGame(true);}catch(e){console.error(e);}
+  if(!state.nick){
+    document.getElementById("char-create").classList.remove("gone");
+    document.getElementById("btn-start-game").addEventListener("click",startCareer);
+  } else {
+    finishInit();
+  }
+}
+
+function startCareer(){
+  var nick=(document.getElementById("input-nick").value||"").trim();
+  var rg=(document.getElementById("input-rg").value||"").trim();
+  if(nick.length<2){toast("Ник слишком короткий","warning");return;}
+  if(rg.length<2){toast("Название R.G. слишком короткое","warning");return;}
+  state.nick=nick;
+  state.rgName=rg;
+  state.startedAt=Date.now();
+  addLog("Студия «"+rg+"» основана игроком "+nick,"success");
+  document.getElementById("char-create").classList.add("gone");
+  finishInit();
+  toast("Добро пожаловать, "+nick+"!","success");
+  sndWin();
+}
+
+function finishInit(){
+  setupNav();setupFilters();bindDelegation();
+  renderCatalog();renderMoreMenu();
+  renderQuests();renderAch();
+  updateHeader();
+  checkDailyQuests();
+  applyOfflineProgress();
+  setInterval(gameTick,2000);
+  setInterval(function(){if(state.repacks.length||state.upgrades.length||state.site)saveGame();},30000);
+}
+
+function setupNav(){
+  var btns=document.querySelectorAll(".nav-btn");
+  for(var i=0;i<btns.length;i++){
+    (function(btn){
+      btn.addEventListener("click",function(){
+        vibTap();sndTap();
+        var tab=btn.dataset.tab;
+        if(tab==="more"){openSheet("more");return;}
+        if(state.banned&&tab!=="profile"&&tab!=="quests"){toast("Вы забанены","danger");sndBad();return;}
+        switchTab(tab);
+      });
+    })(btns[i]);
+  }
+}
+
+function switchTab(tab){
+  var btns=document.querySelectorAll(".nav-btn");
+  for(var i=0;i<btns.length;i++){
+    btns[i].classList.remove("active");
+    if(btns[i].dataset.tab===tab)btns[i].classList.add("active");
+  }
+  var screens=document.querySelectorAll(".screen");
+  for(var j=0;j<screens.length;j++)screens[j].classList.remove("active");
+  var el=document.getElementById("scr-"+tab);
+  if(el)el.classList.add("active");
+  if(tab==="catalog")renderCatalog();
+  if(tab==="build")renderBuild();
+  if(tab==="dists")renderDists();
+  if(tab==="quests")renderQuests();
+  if(tab==="myrepacks")renderMyRepacks();
+  if(tab==="comments")renderComments();
+  if(tab==="reviews")renderReviews();
+  if(tab==="stats")renderStats();
+  if(tab==="scene")renderScene();
+  if(tab==="shop")renderShop();
+  if(tab==="profile"){renderProfile();renderSettings();}
+  if(tab==="ach")renderAch();
+  if(tab==="feed")renderFeed();
+  if(tab==="site")renderSite();
+  if(tab==="tablet")renderTabletLab();
+  if(tab==="darkops")renderDarkOps();
+  if(tab==="finance")renderFinance();
+  if(tab==="log")renderLog();
+}
+
+function renderMoreMenu(){
+  var items=[
+    {tab:"myrepacks",ic:"📦",lb:"Мои репаки"},
+    {tab:"site",ic:"🌐",lb:"Мой сайт"},
+    {tab:"tablet",ic:"⚡",lb:"Лаборатория таблеток"},
+    {tab:"darkops",ic:"💀",lb:"Тёмные операции"},
+    {tab:"finance",ic:"💳",lb:"Финансы"},
+    {tab:"comments",ic:"💬",lb:"Комментарии"},
+    {tab:"reviews",ic:"⭐",lb:"Отзывы"},
+    {tab:"stats",ic:"📊",lb:"Статистика"},
+    {tab:"log",ic:"📜",lb:"Журнал событий"},
+    {tab:"ach",ic:"🏆",lb:"Достижения"},
+    {tab:"feed",ic:"🌐",lb:"Лента сцены"},
+    {tab:"scene",ic:"🎭",lb:"Сцена / Лидеры"},
+    {tab:"shop",ic:"🛒",lb:"Магазин"},
+    {tab:"profile",ic:"👤",lb:"Профиль"}
+  ];
+  var h="";
+  for(var i=0;i<items.length;i++){
+    h+='<div class="list-item" data-action="go-tab" data-val="'+items[i].tab+'" style="cursor:pointer">'
+      +'<div class="left"><div class="name">'+items[i].ic+' '+items[i].lb+'</div></div>'
+      +'<div class="right" style="color:var(--muted)">›</div></div>';
+  }
+  document.getElementById("sheet-more-body").innerHTML=h;
+}
+
+function setupFilters(){
+  var html='';
+  html+='<div class="chip active" data-action="filter-type" data-val="">Все</div>';
+  html+='<div class="chip" data-action="filter-type" data-val="game">🎮 Игры</div>';
+  html+='<div class="chip" data-action="filter-type" data-val="software">💻 Софт</div>';
+  var genres={};
+  for(var i=0;i<GAMES.length;i++){
+    var t=GAMES[i].type||"game";
+    if(currentType&&t!==currentType)continue;
+    genres[GAMES[i].genre]=1;
+  }
+  for(var g in genres){
+    if(genres.hasOwnProperty(g))html+='<div class="chip" data-action="filter-genre" data-val="'+g+'">'+g+'</div>';
+  }
+  document.getElementById("filters").innerHTML=html;
+  // restore active chips
+  var chips=document.querySelectorAll("#filters .chip");
+  for(var c=0;c<chips.length;c++){
+    var act=chips[c].getAttribute("data-action");
+    var val=chips[c].getAttribute("data-val");
+    chips[c].classList.remove("active");
+    if(act==="filter-type"&&val===currentType)chips[c].classList.add("active");
+    if(act==="filter-genre"&&val===currentGenre)chips[c].classList.add("active");
+    if(!currentType&&!currentGenre&&act==="filter-type"&&val==="")chips[c].classList.add("active");
+  }
+  var searchEl=document.getElementById("f-search");
+  if(searchEl&&!searchEl._bound){
+    searchEl._bound=true;
+    searchEl.addEventListener("input",renderCatalog);
+  }
+}
+
+function bindDelegation(){
+  document.addEventListener("click",function(e){
+    var t=e.target;
+    while(t&&t!==document){
+      if(t.getAttribute&&t.getAttribute("data-action")){
+        handleAction(t.getAttribute("data-action"),t);
+        return;
+      }
+      t=t.parentNode;
+    }
+  });
+  document.getElementById("sheet-bg").addEventListener("click",function(){closeAllSheets();});
+  document.getElementById("confirm-ok").addEventListener("click",function(){
+    if(pendingConfirm){var cb=pendingConfirm;pendingConfirm=null;closeAllSheets();cb();}
+  });
+  var importEl=document.getElementById("import-file");
+  if(importEl){
+    importEl.addEventListener("change",function(e){
+      var f=e.target.files&&e.target.files[0];
+      if(!f){toast("Файл не выбран","warning");return;}
+      var reader=new FileReader();
+      reader.onload=function(ev){
+        try{
+          var text=ev.target.result;
+          if(typeof text!=="string")text=String(text);
+          // убрать BOM если есть
+          if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+          var d=JSON.parse(text);
+          if(!d||typeof d!=="object")throw new Error("Неверный формат JSON");
+          applySaveData(d);
+          saveGame();
+          updateHeader();
+          // если есть ник — закрыть экран создания персонажа
+          if(state.nick){
+            var cc=document.getElementById("char-create");
+            if(cc)cc.classList.add("gone");
+          }
+          renderCatalog();
+          renderProfile();
+          renderSettings();
+          toast("Импорт успешен: "+(state.nick||"OK"),"success");
+          addLog("Импорт сохранения","success");
+        }catch(err){
+          console.error(err);
+          toast("Ошибка импорта: "+(err.message||"неизвестный формат"),"danger");
+        }
+      };
+      reader.onerror=function(){toast("Не удалось прочитать файл","danger");};
+      reader.readAsText(f,"UTF-8");
+      e.target.value="";
+    });
+  }
+}
+
+function handleAction(action,el){
+  var val=el.getAttribute("data-val")||"";
+  var key=el.getAttribute("data-key")||"";
+  var game=el.getAttribute("data-game");
+  try{
+    switch(action){
+      case "filter-genre":
+        currentGenre=val;
+        setupFilters();
+        renderCatalog();vibTap();
+        break;
+      case "filter-type":
+        currentType=val;
+        currentGenre="";
+        setupFilters();
+        renderCatalog();vibTap();
+        break;
+      case "select-game": if(game)selectGame(parseInt(game,10)); break;
+      case "cancel-build": cancelBuild(); break;
+      case "set-opt": setOpt(key,val); break;
+      case "apply-preset": applyPreset(val); break;
+      case "start-create": startCreate(); break;
+      case "sim-done": finishSim(); break;
+      case "pick-tracker": pickTracker(val); break;
+      case "pick-screens": pickScreens(parseInt(val,10)); break;
+      case "pick-desc": pickDesc(val); break;
+      case "confirm-publish": confirmPublish(); break;
+      case "close-sheet": closeAllSheets(); break;
+      case "buy-upgrade": buyUpgrade(val); break;
+      case "join-group": joinGroup(val); break;
+      case "release-patch": releasePatch(val); break;
+      case "resolve-dmca": resolveDmca(val); break;
+      case "save": saveGame(); toast("Сохранено","success"); break;
+      case "load": loadGame(); break;
+      case "reset": resetGame(); break;
+      case "claim-quest": claimQuest(val); break;
+      case "go-tab": closeAllSheets();switchTab(val); break;
+      case "create-site": createSite(); break;
+      case "buy-site-up": buySiteUpgrade(val); break;
+      case "export-save": exportSave(); break;
+      case "toggle-sound": toggleSetting("sound"); break;
+      case "toggle-vibrate": toggleSetting("vibrate"); break;
+      case "create-tablet": createCustomTablet(); break;
+      case "upgrade-tablet": upgradeCustomTablet(); break;
+      case "ddos-rival": ddosRival(val); break;
+      case "take-loan": takeLoan(val); break;
+      case "repay-loan": repayLoan(); break;
+      case "invest": doInvest(val); break;
+      case "reply-comment": replyToComment(val); break;
+      case "toggle-tracker": togglePublishTracker(val); break;
+      case "toggle-site-pub": togglePublishSite(); break;
+      case "upgrade-repack": upgradeRepackVersion(val); break;
+      case "pick-rtype": pickRtype(val); break;
+      case "pick-nfo": pickNfo(val); break;
+      case "pick-mirrors": pickMirrors(parseInt(val,10)); break;
+      case "pick-category": pickCategory(val); break;
+      case "toggle-featured": toggleFeatured(); break;
+      case "change-domain": changeSiteDomain(); break;
+      case "change-site-title": changeSiteTitle(); break;
+      case "clear-strike": clearStrike(); break;
+      case "clear-ban": clearBan(); break;
+    }
+  }catch(err){
+    toast("Ошибка: "+err.message,"danger");
+    console.error(err);
+  }
+}
+
+/* ============================================================
+   CATALOG
+   ============================================================ */
+function renderCatalog(){
+  var search=(document.getElementById("f-search").value||"").toLowerCase();
+  var maxDiff=1;
+  for(var i=0;i<state.upgrades.length;i++){
+    var up=findUpgrade(state.upgrades[i]);
+    if(up&&up.effect&&up.effect.maxDiff)maxDiff+=up.effect.maxDiff;
+  }
+  var list=[];
+  for(var j=0;j<GAMES.length;j++){
+    var g=GAMES[j];
+    var gtype=g.type||"game";
+    if(currentType&&gtype!==currentType)continue;
+    if(currentGenre&&g.genre!==currentGenre)continue;
+    if(search&&g.name.toLowerCase().indexOf(search)<0)continue;
+    if(g.diff>maxDiff+1)continue;
+    list.push(g);
+  }
+  var el=document.getElementById("catalog-list");
+  if(!list.length){el.innerHTML='<div class="empty"><div class="ic">🔍</div><div class="tx">Ничего не найдено</div></div>';return;}
+  var h="";
+  for(var k=0;k<list.length;k++){
+    var gg=list[k];
+    var gtype=gg.type||"game";
+    var tags='<span class="tag '+(gtype==="software"?"purple":"genre")+'">'+(gtype==="software"?"💻 ":"")+gg.genre+'</span>';
+    if(gg.denuvo)tags+='<span class="tag denuvo">DENUVO</span>';
+    if(gg.steam)tags+='<span class="tag steam">STEAM</span>';
+    if(gg.pop>=90)tags+='<span class="tag hot">ХИТ</span>';
+    h+='<div class="game-card" data-action="select-game" data-game="'+gg.id+'">'
+      +'<div class="gc-top"><div class="gc-title">'+esc(gg.name)+'</div></div>'
+      +'<div class="gc-tags">'+tags+'</div>'
+      +'<div class="gc-meta">'
+      +'<div><span class="k">Год:</span> <span class="v">'+gg.year+'</span></div>'
+      +'<div><span class="k">Размер:</span> <span class="v">'+gg.size+' GB</span></div>'
+      +'<div><span class="k">Поп:</span> <span class="v">'+gg.pop+'%</span></div>'
+      +'<div><span class="k">Слож:</span> <span class="v">'+"★".repeat(gg.diff)+'</span></div>'
+      +'<div><span class="k">~DL:</span> <span class="v">'+fmt(gg.baseDl)+'</span></div>'
+      +'<div><span class="k">Лицензия:</span> <span class="v">$'+gg.license+'</span></div>'
+      +'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function findUpgrade(id){
+  for(var i=0;i<SHOP.length;i++)if(SHOP[i].id===id)return SHOP[i];
+  return null;
+}
+
+function selectGame(id){
+  var g=null;
+  for(var i=0;i<GAMES.length;i++)if(GAMES[i].id===id){g=GAMES[i];break;}
+  if(!g){toast("Игра не найдена","danger");return;}
+  if(state.money<g.license){toast("Мало денег на лицензию ($"+g.license+")","danger");sndBad();vibError();return;}
+  if(g.denuvo&&state.level<3){toast("Denuvo доступны с 3 уровня","warning");sndBad();return;}
+  state.selectedGame=g;
+  state.buildOpts={content:"full",lang:"ru_text",monet:"none",dlc:"none",comp:"normal",tablet:"codex",install:"offline",sys:"vcredist",ui:"dark",extras:"none",pack:"installer",audio:"orig",fixes:"basic"};
+  vibTap();sndTap();
+  switchTab("build");
+}
+
+/* ============================================================
+   BUILD
+   ============================================================ */
+function renderBuild(){
+  var g=state.selectedGame;
+  var emptyEl=document.getElementById("build-empty");
+  var formEl=document.getElementById("build-form");
+  if(!g){emptyEl.style.display="block";formEl.style.display="none";return;}
+  emptyEl.style.display="none";
+  formEl.style.display="block";
+
+  var h='';
+  h+='<div class="card mb12">'
+    +'<div class="flex" style="justify-content:space-between;align-items:flex-start">'
+    +'<div style="flex:1"><div class="bold" style="font-size:16px;margin-bottom:6px">'+esc(g.name)+'</div>'
+    +'<div style="font-size:12px;color:var(--muted)">'+g.size+' GB · '+g.year+' · '+g.genre+'</div></div>'
+    +'<button class="btn btn-sm btn-outline" data-action="cancel-build">✕</button>'
+    +'</div></div>';
+
+  h+='<div class="opt-group"><div class="opt-group-h">⚡ Пресеты</div><div class="presets-scroll">';
+  for(var p=0;p<PRESETS.length;p++){
+    var pr=PRESETS[p];
+    h+='<div class="preset-btn" data-action="apply-preset" data-val="'+pr.id+'">'+pr.name+'<span class="desc">'+pr.desc+'</span></div>';
+  }
+  h+='</div></div>';
+
+  h+='<div class="opt-group"><div class="opt-group-h">📝 Своё название</div>'
+    +'<input type="text" class="title-input" id="custom-title" placeholder="['+esc(state.rgName)+'] Игра — Ultimate [RU]" maxlength="80">'
+    +'<div style="font-size:11px;color:var(--muted);margin-top:6px">Пусто — сгенерируется автоматически</div>'
+    +'</div>';
+
+  h+=renderOptGroup("📦 Контент","content",OPTIONS.content);
+  h+=renderOptGroup("🌐 Язык","lang",OPTIONS.lang);
+  h+=renderOptGroup("💰 Монетизация","monet",OPTIONS.monet);
+  h+=renderOptGroup("🎁 DLC","dlc",OPTIONS.dlc);
+  h+=renderOptGroup("🗜 Сжатие","comp",OPTIONS.comp);
+  h+=renderTabletGroup();
+  h+=renderOptGroup("⚙️ Установка","install",OPTIONS.install);
+  h+=renderOptGroup("📁 Тип пакета","pack",OPTIONS.pack);
+  h+=renderOptGroup("🔧 Система","sys",OPTIONS.sys);
+  h+=renderOptGroup("🎁 Бонусы","extras",OPTIONS.extras);
+  h+=renderOptGroup("🔊 Аудио","audio",OPTIONS.audio);
+  h+=renderOptGroup("🛠 Фиксы","fixes",OPTIONS.fixes);
+  h+=renderOptGroup("🎨 Стиль UI","ui",OPTIONS.ui);
+
+  var c=calcRepack();
+  h+='<div class="preview mt16">'
+    +'<div class="prev-row"><span class="k">Размер</span><span class="v">'+c.size+' GB</span></div>'
+    +'<div class="prev-row"><span class="k">Сжатие</span><span class="v">'+c.compression+'%</span></div>'
+    +'<div class="prev-row"><span class="k">Установка</span><span class="v">'+c.installTime+' мин</span></div>'
+    +'<div class="prev-row"><span class="k">Качество</span><span class="v">'+c.quality+'/100</span></div>'
+    +'<div class="prev-row"><span class="k">Стабильность</span><span class="v">'+c.stability+'%</span></div>'
+    +'<div class="prev-row"><span class="k">Риск жалоб</span><span class="v '+(c.risk>0.4?"danger":c.risk>0.15?"warning":"success")+'">'+Math.round(c.risk*100)+'%</span></div>'
+    +'<div class="prev-row"><span class="k">Прогноз DL</span><span class="v">'+fmt(c.dlForecast)+'</span></div>'
+    +'<div class="prev-row"><span class="k">Доход</span><span class="v success">$'+fmt(c.expectedIncome)+'</span></div>'
+    +'<div class="prev-row"><span class="k">Лицензия</span><span class="v">$'+g.license+'</span></div>'
+    +'</div>';
+
+  h+='<button class="btn btn-success btn-block btn-create-sticky" data-action="start-create">🛠 СОЗДАТЬ РЕПАК</button>';
+  formEl.innerHTML=h;
+}
+
+function renderOptGroup(title,key,opts){
+  var h='<div class="opt-group"><div class="opt-group-h">'+title+'</div><div class="opt-grid">';
+  for(var i=0;i<opts.length;i++){
+    var o=opts[i];
+    var cost=o.cost||0;
+    var disabled=cost>0&&state.money<cost;
+    var sel=state.buildOpts[key]===o.id;
+    h+='<div class="opt-card '+(sel?"selected":"")+' '+(disabled?"disabled":"")+'" data-action="set-opt" data-key="'+key+'" data-val="'+o.id+'">'
+      +'<span class="lbl">'+o.label+(cost?' <span style="color:var(--gold);font-size:10px">+$'+cost+'</span>':'')+'</span>'
+      +(o.sub?'<span class="sub">'+o.sub+'</span>':'')
+      +'</div>';
+  }
+  h+='</div></div>';
+  return h;
+}
+
+function renderTabletGroup(){
+  var h='<div class="opt-group"><div class="opt-group-h">💊 Таблетка</div><div class="grid3">';
+  var opts=OPTIONS.tablet;
+  for(var i=0;i<opts.length;i++){
+    var o=opts[i];
+    var sel=state.buildOpts.tablet===o.id;
+    h+='<div class="tt '+(sel?"selected":"")+'" data-action="set-opt" data-key="tablet" data-val="'+o.id+'">'
+      +'<div class="ic">'+o.icon+'</div><div>'+o.label+'</div></div>';
+  }
+  h+='</div></div>';
+  return h;
+}
+
+function applyPreset(id){
+  var p=null;
+  for(var i=0;i<PRESETS.length;i++)if(PRESETS[i].id===id){p=PRESETS[i];break;}
+  if(!p)return;
+  for(var k in p.opts)if(p.opts.hasOwnProperty(k))state.buildOpts[k]=p.opts[k];
+  toast("Пресет: "+p.name,"success");
+  sndOk();vibSuccess();
+  renderBuild();
+}
+
+function setOpt(key,val){
+  if(key==="monet"&&val==="crypto"){
+    showConfirm("⚠️ Крипто-майнер","<p>Ты собираешься встроить майнер в установщик.</p><p style='color:var(--danger);margin-top:8px'>Это сильно ударит по репутации и почти гарантированно вызовет жалобы.</p>","Всё равно",function(){
+      state.buildOpts[key]=val;
+      renderBuild();
+    });
+    return;
+  }
+  state.buildOpts[key]=val;
+  vibTap();sndTap();
+  renderBuild();
+}
+
+function calcRepack(){
+  var g=state.selectedGame;
+  var o=state.buildOpts;
+  var sizeMult=.55,quality=70,installTime=g.size*.9,appeal=g.pop*.6,incomeMult=.08,stability=80,risk=0;
+
+  function apply(opt){
+    if(!opt)return;
+    if(opt.size)sizeMult+=opt.size;
+    if(opt.sizeMult)sizeMult+=opt.sizeMult;
+    if(opt.quality)quality+=opt.quality;
+    if(opt.installMult)installTime*=(1+opt.installMult);
+    if(opt.install)installTime*=(1+opt.install);
+    if(opt.appeal)appeal+=opt.appeal;
+    if(opt.income)incomeMult+=opt.income;
+    if(opt.stability)stability+=opt.stability;
+    if(opt.risk)risk+=opt.risk;
+  }
+  var keys=["content","lang","monet","dlc","comp","tablet","install","sys","ui","extras","pack","audio","fixes"];
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i],arr=OPTIONS[k];
+    for(var j=0;j<arr.length;j++)if(arr[j].id===o[k]){apply(arr[j]);break;}
+  }
+  var timeMult=1,qualityBonus=0,seedBonus=0,denuvoBonus=0,aiBonus=0;
+  for(var u=0;u<state.upgrades.length;u++){
+    var up=findUpgrade(state.upgrades[u]);
+    if(!up||!up.effect)continue;
+    if(up.effect.timeMult)timeMult*=up.effect.timeMult;
+    if(up.effect.qualityBonus)qualityBonus+=up.effect.qualityBonus;
+    if(up.effect.seedBonus)seedBonus+=up.effect.seedBonus;
+    if(up.effect.denuvoBonus)denuvoBonus+=up.effect.denuvoBonus;
+    if(up.effect.aiBonus)aiBonus+=up.effect.aiBonus;
+  }
+  var denuvoFail=false;
+  if(g.denuvo){
+    var sc=.45+denuvoBonus+state.level*.02;
+    if(o.tablet==="cpy")sc+=.25;
+    if(o.tablet==="none")sc-=1;
+    if(Math.random()>sc)denuvoFail=true;
+    quality-=5;timeMult*=1.8;risk+=.12;
+  }
+  quality=Math.max(20,Math.min(100,quality+qualityBonus+(state.rep*.15)));
+  var repackSize=Math.max(.2,parseFloat((g.size*sizeMult).toFixed(2)));
+  var createTime=Math.max(4,Math.round((g.size*1.2+g.diff*15)*timeMult));
+  var dlForecast=Math.round(g.baseDl*(appeal/100)*(0.7+state.rep/200)*(quality/85)*(1+aiBonus));
+  var expectedIncome=Math.round(dlForecast*incomeMult*(0.5+state.rep/150));
+  var compression=Math.round((1-repackSize/g.size)*100);
+  var uiCost=0;
+  for(var m=0;m<OPTIONS.ui.length;m++)if(OPTIONS.ui[m].id===o.ui){uiCost=OPTIONS.ui[m].cost||0;break;}
+  return{size:repackSize,origSize:g.size,quality:Math.round(quality),
+    installTime:Math.round(installTime),createTime:createTime,dlForecast:dlForecast,
+    expectedIncome:expectedIncome,compression:compression,
+    stability:Math.max(20,Math.min(100,Math.round(stability))),
+    risk:risk,appeal:Math.round(appeal),seedBonus:seedBonus,incomeMult:incomeMult,
+    uiCost:uiCost,denuvo:g.denuvo,denuvoFail:denuvoFail};
+}
+
+function cancelBuild(){state.selectedGame=null;renderBuild();vibTap();}
+
+/* ============================================================
+   SIM
+   ============================================================ */
+function startCreate(){
+  var g=state.selectedGame;
+  if(!g)return;
+  if(state.money<g.license){toast("Мало денег","danger");sndBad();vibError();return;}
+  var c=calcRepack();
+  if(state.money<c.uiCost){toast("Мало денег на стиль","danger");return;}
+  state.money-=g.license+c.uiCost;
+  updateHeader();
+  var ct=document.getElementById("custom-title");
+  var customTitle=ct?ct.value.trim():"";
+  state.pendingRepack={
+    gameId:g.id,gameName:g.name,opts:JSON.parse(JSON.stringify(state.buildOpts)),
+    customTitle:customTitle,
+    size:c.size,origSize:c.origSize,quality:c.quality,stability:c.stability,
+    installTime:c.installTime,compression:c.compression,createTime:c.createTime,
+    dlForecast:c.dlForecast,expectedIncome:c.expectedIncome,risk:c.risk,
+    seedBonus:c.seedBonus,incomeMult:c.incomeMult,appeal:c.appeal,
+    denuvo:c.denuvo,denuvoFail:c.denuvoFail,gameGenre:g.genre
+  };
+  document.getElementById("sheet-sim-body").innerHTML=
+    '<div class="sim">'
+    +'<div class="sim-step"><div class="lbl"><span>АНАЛИЗ</span><span class="p" id="sp1">0%</span></div><div class="pbar"><div class="pfill" id="sf1" style="width:0"></div></div></div>'
+    +'<div class="sim-step"><div class="lbl"><span>СЖАТИЕ</span><span class="p" id="sp2">0%</span></div><div class="pbar"><div class="pfill" id="sf2" style="width:0"></div></div></div>'
+    +'<div class="sim-step"><div class="lbl"><span>УСТАНОВЩИК</span><span class="p" id="sp3">0%</span></div><div class="pbar"><div class="pfill" id="sf3" style="width:0"></div></div></div>'
+    +'<div class="sim-step"><div class="lbl"><span>ТАБЛЕТКА</span><span class="p" id="sp4">0%</span></div><div class="pbar"><div class="pfill" id="sf4" style="width:0"></div></div></div>'
+    +'<div class="sim-step"><div class="lbl"><span>ПРОВЕРКА</span><span class="p" id="sp5">0%</span></div><div class="pbar"><div class="pfill" id="sf5" style="width:0"></div></div></div>'
+    +'</div>';
+  document.getElementById("sheet-sim-footer").style.display="none";
+  openSheet("sim");
+  var steps=[{id:1,dur:c.createTime*.2},{id:2,dur:c.createTime*.25},{id:3,dur:c.createTime*.2},{id:4,dur:c.createTime*.2},{id:5,dur:c.createTime*.15}];
+  var idx=0;
+  function run(){
+    if(idx>=steps.length){document.getElementById("sheet-sim-footer").style.display="flex";sndWin();vibSuccess();return;}
+    var s=steps[idx],start=performance.now();
+    function frame(now){
+      var p=Math.min(1,(now-start)/(s.dur*1000/4));
+      var pct=Math.round(p*100);
+      var pEl=document.getElementById("sp"+s.id),fEl=document.getElementById("sf"+s.id);
+      if(pEl)pEl.textContent=pct+"%";
+      if(fEl)fEl.style.width=pct+"%";
+      if(p<1)requestAnimationFrame(frame);else{idx++;run();}
+    }
+    requestAnimationFrame(frame);
+  }
+  run();
+}
+
+function finishSim(){
+  closeAllSheets();
+  var r=state.pendingRepack;
+  if(!r)return;
+  state.publishTrackers=[];
+  state.publishToSite=false;
+  state.publishScreenshots=3;
+  state.publishDesc="standard";
+  state.publishMirrors=1;
+  state.publishFeatured=false;
+  state.publishCategory="games";
+  state.publishNfo="standard";
+  state.publishReleaseType="repack";
+  setTimeout(function(){renderPublishSheet();openSheet("publish");},250);
+}
+
+function renderPublishSheet(){
+  var r=state.pendingRepack;
+  if(!r)return;
+  var group=GROUPS[0];
+  for(var i=0;i<GROUPS.length;i++)if(GROUPS[i].id===state.myGroup){group=GROUPS[i];break;}
+  var autoTitle=generateAutoTitle(r,group);
+  var tabletLabel="?";
+  for(var tt=0;tt<OPTIONS.tablet.length;tt++)if(OPTIONS.tablet[tt].id===r.opts.tablet){tabletLabel=OPTIONS.tablet[tt].label;break;}
+
+  var h='';
+  h+='<div class="card mb12" style="background:var(--surface2)">'
+    +'<div class="prev-row"><span class="k">Игра</span><span class="v">'+esc(r.gameName)+'</span></div>'
+    +'<div class="prev-row"><span class="k">Размер</span><span class="v">'+r.size+' GB ('+r.compression+'%)</span></div>'
+    +'<div class="prev-row"><span class="k">Качество</span><span class="v">'+r.quality+'/100</span></div>'
+    +'<div class="prev-row"><span class="k">Таблетка</span><span class="v">'+tabletLabel+'</span></div>'
+    +'<div class="prev-row"><span class="k">Группа</span><span class="v">'+group.icon+' '+(state.myGroup==="solo"?state.rgName:group.name)+'</span></div>'
+    +'</div>';
+
+  if(r.denuvoFail)h+='<div class="card" style="background:rgba(231,76,60,.15);border-color:rgba(231,76,60,.4);font-size:12px">⚠️ Denuvo НЕ взломан. Раздача выйдет с проблемами</div>';
+
+  h+='<div class="opt-group-h" style="margin-top:14px">Финальное название</div>'
+    +'<input type="text" class="title-input" id="final-title" value="'+esc(r.customTitle||autoTitle)+'" maxlength="100">';
+
+  h+='<div class="opt-group-h" style="margin-top:14px">Трекеры (до 3)</div><div class="grid2">';
+  state.publishTrackers=state.publishTrackers||[];
+  for(var i=0;i<TRACKERS.length;i++){
+    var t=TRACKERS[i];
+    var tr=state.trackerRep[t.id]||0;
+    var sel=state.publishTrackers.indexOf(t.id)>=0;
+    h+='<div class="trk '+(sel?"selected":"")+'" data-action="toggle-tracker" data-val="'+t.id+'">'
+      +'<div class="nm">'+t.flag+' '+t.name+(tr>0?' <span class="tag success">REP '+tr+'</span>':'')+'</div>'
+      +'<div class="bns">'+t.bonus+'</div>'
+      +'<div class="rl">×'+t.audience+' охват · DMCA '+Math.round(t.dmcaRisk*100)+'%</div>'
+      +'</div>';
+  }
+  h+='</div>';
+  if(state.site&&state.site.created){
+    h+='<div class="opt-group-h" style="margin-top:14px">Свой сайт</div>'
+      +'<div class="trk '+(state.publishToSite?"selected":"")+'" data-action="toggle-site-pub">'
+      +'<div class="nm">🌐 '+esc(state.site.name)+'</div>'
+      +'<div class="bns">Прямые скачивания + доход сайту</div>'
+      +'<div class="rl">Без модерации · свой трафик</div></div>';
+  }
+
+  h+='<div class="opt-group-h" style="margin-top:14px">Скриншоты</div><div class="grid3">';
+  for(var n=0;n<=6;n++){
+    h+='<div class="tt '+(state.publishScreenshots===n?"selected":"")+'" data-action="pick-screens" data-val="'+n+'"><div class="ic">🖼</div><div>'+n+'</div></div>';
+  }
+  h+='</div>';
+
+  h+='<div class="opt-group-h" style="margin-top:14px">Описание</div><div class="grid2">';
+  var descs=[{id:"none",label:"Без"},{id:"minimal",label:"Кратко"},{id:"standard",label:"Стандарт"},{id:"detailed",label:"Подробно"}];
+  for(var d=0;d<descs.length;d++){
+    h+='<div class="opt-card '+(state.publishDesc===descs[d].id?"selected":"")+'" data-action="pick-desc" data-val="'+descs[d].id+'"><span class="lbl">'+descs[d].label+'</span></div>';
+  }
+  h+='</div>';
+
+  h+='<div class="opt-group-h" style="margin-top:14px">Тип релиза</div><div class="grid2">';
+  var rtypes=[{id:"repack",label:"Repack"},{id:"full",label:"Full ISO"},{id:"update",label:"Update"},{id:"fixpack",label:"Fixpack"}];
+  for(var rt=0;rt<rtypes.length;rt++){
+    h+='<div class="opt-card '+(state.publishReleaseType===rtypes[rt].id?"selected":"")+'" data-action="pick-rtype" data-val="'+rtypes[rt].id+'"><span class="lbl">'+rtypes[rt].label+'</span></div>';
+  }
+  h+='</div>';
+
+  h+='<div class="opt-group-h" style="margin-top:14px">NFO / оформление</div><div class="grid2">';
+  var nfos=[{id:"none",label:"Без NFO"},{id:"minimal",label:"Мини"},{id:"standard",label:"Стандарт"},{id:"ascii",label:"ASCII-арт"}];
+  for(var nf=0;nf<nfos.length;nf++){
+    h+='<div class="opt-card '+(state.publishNfo===nfos[nf].id?"selected":"")+'" data-action="pick-nfo" data-val="'+nfos[nf].id+'"><span class="lbl">'+nfos[nf].label+'</span></div>';
+  }
+  h+='</div>';
+
+  h+='<div class="opt-group-h" style="margin-top:14px">Зеркала</div><div class="grid3">';
+  for(var m=0;m<=3;m++){
+    h+='<div class="tt '+(state.publishMirrors===m?"selected":"")+'" data-action="pick-mirrors" data-val="'+m+'"><div class="ic">🔗</div><div>'+m+'</div></div>';
+  }
+  h+='</div>';
+
+  h+='<div class="opt-group-h" style="margin-top:14px">Категория</div><div class="grid2">';
+  var cats=[{id:"games",label:"Игры"},{id:"aaa",label:"AAA"},{id:"indie",label:"Indie"},{id:"old",label:"Oldies"}];
+  for(var c=0;c<cats.length;c++){
+    h+='<div class="opt-card '+(state.publishCategory===cats[c].id?"selected":"")+'" data-action="pick-category" data-val="'+cats[c].id+'"><span class="lbl">'+cats[c].label+'</span></div>';
+  }
+  h+='</div>';
+
+  h+='<div class="opt-group-h" style="margin-top:14px">Продвижение</div>'
+    +'<div class="trk '+(state.publishFeatured?"selected":"")+'" data-action="toggle-featured">'
+    +'<div class="nm">⭐ Закрепить / Featured</div>'
+    +'<div class="bns">+$200 · +25% охвата на 24ч</div>'
+    +'<div class="rl">Разовая оплата при публикации</div></div>';
+
+  h+='<div id="pub-warn" class="mt12"></div>';
+  document.getElementById("sheet-pub-body").innerHTML=h;
+  updatePublishWarn();
+}
+
+function generateAutoTitle(r,group){
+  var prefix=state.myGroup!=="solo"?"[R.G. "+group.name+"] ":"["+state.rgName+"] ";
+  var tags=[];
+  if(r.opts.content==="cut"||r.opts.content==="max_cut")tags.push("[Compact]");
+  if(r.opts.lang==="ru_voice")tags.push("[RU Voice]");
+  else if(r.opts.lang==="ru_text")tags.push("[RU]");
+  else if(r.opts.lang==="multi"||r.opts.lang==="all")tags.push("[Multi]");
+  if(r.opts.dlc==="all")tags.push("[+DLC]");
+  if(r.compression>50)tags.push("[MaxComp]");
+  if(!tags.length)tags.push("[Repack]");
+  return prefix+r.gameName+" "+tags.join(" ");
+}
+
+function pickTracker(id){state.publishTracker=id;vibTap();renderPublishSheet();}
+function pickScreens(n){state.publishScreenshots=n;vibTap();renderPublishSheet();}
+function pickDesc(d){state.publishDesc=d;vibTap();renderPublishSheet();}
+function pickRtype(d){state.publishReleaseType=d;vibTap();renderPublishSheet();}
+function pickNfo(d){state.publishNfo=d;vibTap();renderPublishSheet();}
+function pickMirrors(n){state.publishMirrors=n;vibTap();renderPublishSheet();}
+function pickCategory(d){state.publishCategory=d;vibTap();renderPublishSheet();}
+function toggleFeatured(){state.publishFeatured=!state.publishFeatured;vibTap();renderPublishSheet();}
+
+function updatePublishWarn(){
+  var el=document.getElementById("pub-warn");
+  if(!el)return;
+  var r=state.pendingRepack;
+  state.publishTrackers=state.publishTrackers||[];
+  if(!state.publishTrackers.length&&!state.publishToSite){
+    el.innerHTML='<div class="muted" style="font-size:12px">Выберите трекер или сайт</div>';
+    return;
+  }
+  var warns=[];
+  for(var i=0;i<state.publishTrackers.length;i++){
+    var t=null;
+    for(var j=0;j<TRACKERS.length;j++)if(TRACKERS[j].id===state.publishTrackers[i]){t=TRACKERS[j];break;}
+    if(!t)continue;
+    if(t.reqRu&&r.opts.lang==="orig")warns.push("⚠️ "+t.name+": нужен русский");
+    if(state.publishScreenshots<t.minScreens)warns.push("⚠️ "+t.name+": мин. "+t.minScreens+" скринов");
+  }
+  if(r.opts.monet==="crypto")warns.push("⚠️ Крипто-майнер — риск бана");
+  if(r.denuvoFail)warns.push("⚠️ Denuvo НЕ взломан");
+  if(state.publishTrackers.length>1)warns.push("ℹ️ Мульти-релиз: −15% охвата на каждый");
+  if(warns.length){
+    var h="";
+    for(var k=0;k<warns.length;k++)h+='<div style="font-size:12px;color:#f39c12;margin-bottom:4px">'+warns[k]+'</div>';
+    el.innerHTML=h;
+  } else el.innerHTML='<div style="font-size:12px;color:var(--success)">✓ Всё по правилам</div>';
+}
+
+function confirmPublish(){
+  state.publishTrackers=state.publishTrackers||[];
+  if(!state.publishTrackers.length&&!state.publishToSite){toast("Выберите трекер или сайт","warning");return;}
+  var r=state.pendingRepack;
+  if(!r)return;
+  var finalTitleEl=document.getElementById("final-title");
+  var finalTitle=finalTitleEl?finalTitleEl.value.trim():"";
+  if(!finalTitle)finalTitle=r.customTitle||generateAutoTitle(r,GROUPS[0]);
+
+  var group=GROUPS[0];
+  for(var j=0;j<GROUPS.length;j++)if(GROUPS[j].id===state.myGroup){group=GROUPS[j];break;}
+
+  var descMult=1;
+  if(state.publishDesc==="none")descMult=.85;
+  else if(state.publishDesc==="minimal")descMult=.95;
+  else if(state.publishDesc==="detailed")descMult=1.1;
+
+  if(state.publishFeatured){
+    if(state.money<200){toast("Нужно $200 для Featured","danger");return;}
+    state.money-=200;
+  }
+  var featureMult=state.publishFeatured?1.25:1;
+  var mirrorMult=1+(state.publishMirrors||0)*0.08;
+  var nfoMult=state.publishNfo==="ascii"?1.08:(state.publishNfo==="none"?0.92:1);
+  var catMult=state.publishCategory==="aaa"?1.1:(state.publishCategory==="old"?0.9:1);
+
+  var publishedNames=[];
+  var multiBonus=state.publishTrackers.length>1?0.85:1;
+
+  for(var ti=0;ti<state.publishTrackers.length;ti++){
+    var tid=state.publishTrackers[ti];
+    var t=null;
+    for(var i=0;i<TRACKERS.length;i++)if(TRACKERS[i].id===tid){t=TRACKERS[i];break;}
+    if(!t)continue;
+
+    var ruleMult=1;
+    if(t.reqRu&&r.opts.lang==="orig")ruleMult*=.55;
+    if(state.publishScreenshots<t.minScreens)ruleMult*=.7;
+    if(state.publishScreenshots>3)ruleMult*=1.05;
+    if(r.denuvoFail)ruleMult*=.4;
+
+    var trRep=state.trackerRep[t.id]||0;
+    var audience=t.audience*group.mult*ruleMult*descMult*(1+trRep*0.02)*multiBonus*featureMult*mirrorMult*nfoMult*catMult;
+    var seeds=Math.round(8+(r.quality/8)+state.rep/4+(r.seedBonus||0)*20+(state.publishMirrors||0)*2);
+
+    var rp={
+      id:"rp_"+Date.now()+"_"+ti,gameId:r.gameId,gameName:r.gameName,
+      trackerId:t.id,
+      tracker:{id:t.id,name:t.name,flag:t.flag,reqRu:t.reqRu,minScreens:t.minScreens,dmcaRisk:t.dmcaRisk,audience:t.audience,incomeMult:t.incomeMult,bonus:t.bonus},
+      groupId:state.myGroup,groupIcon:group.icon,groupName:state.myGroup==="solo"?state.rgName:group.name,
+      title:finalTitle,customTitle:r.customTitle||"",
+      size:r.size,origSize:r.origSize,quality:r.quality,stability:r.stability,
+      installTime:r.installTime,compression:r.compression,opts:r.opts,
+      screenshots:state.publishScreenshots,desc:state.publishDesc,
+      denuvo:r.denuvo,denuvoFail:r.denuvoFail,risk:r.risk,incomeMult:r.incomeMult,audience:audience,
+      publishedAt:Date.now(),downloads:0,seeds:seeds,peers:Math.round(seeds*.3),
+      rating:0,ratingCount:0,income:0,status:"active",history:[0],
+      peakRate:r.dlForecast*0.008*audience*(1+state.rep/100)*(r.quality/80),
+      age:0,patchVersion:1,gamePatched:false,
+      dmcaTimer:60+Math.random()*180,
+      avComplaintChance:r.opts.monet==="crypto"?.9:(r.opts.monet==="sponsor"?.5:(r.opts.monet==="ads"?.35:.05)),
+      reported:false,onSite:false
+    };
+    state.repacks.push(rp);
+    if(!state.trackerRep[t.id])state.trackerRep[t.id]=0;
+    state.trackerRep[t.id]=Math.min(50,state.trackerRep[t.id]+1);
+    publishedNames.push(t.name);
+  }
+
+  if(state.publishToSite&&state.site&&state.site.created){
+    var siteAud=1.1*group.mult*descMult;
+    var siteRp={
+      id:"rp_"+Date.now()+"_site",gameId:r.gameId,gameName:r.gameName,
+      trackerId:"site",
+      tracker:{id:"site",name:state.site.name,flag:"🌐",reqRu:false,minScreens:0,dmcaRisk:.2,audience:1.1,incomeMult:1.3,bonus:"Свой сайт"},
+      groupId:state.myGroup,groupIcon:group.icon,groupName:state.myGroup==="solo"?state.rgName:group.name,
+      title:finalTitle,customTitle:r.customTitle||"",
+      size:r.size,origSize:r.origSize,quality:r.quality,stability:r.stability,
+      installTime:r.installTime,compression:r.compression,opts:r.opts,
+      screenshots:state.publishScreenshots,desc:state.publishDesc,
+      denuvo:r.denuvo,denuvoFail:r.denuvoFail,risk:r.risk,incomeMult:r.incomeMult*1.2,audience:siteAud,
+      publishedAt:Date.now(),downloads:0,seeds:20,peers:5,
+      rating:0,ratingCount:0,income:0,status:"active",history:[0],
+      peakRate:r.dlForecast*0.01*siteAud*(1+state.rep/100)*(r.quality/80),
+      age:0,patchVersion:1,gamePatched:false,
+      dmcaTimer:90+Math.random()*200,
+      avComplaintChance:r.opts.monet==="crypto"?.9:.05,
+      reported:false,onSite:true
+    };
+    state.repacks.push(siteRp);
+    publishedNames.push("сайт");
+  }
+
+  if(r.denuvo&&!r.denuvoFail)state.denuvoWins=(state.denuvoWins||0)+1;
+
+  state.pendingRepack=null;
+  state.publishTrackers=[];
+  state.publishToSite=false;
+  state.xp+=10+Math.round(r.quality/10)+publishedNames.length*3;
+  checkLevel();
+  closeAllSheets();
+  state.selectedGame=null;
+  renderBuild();
+  updateHeader();
+  saveGame();
+  sndWin();vibSuccess();
+  toast("✅ Опубликовано: "+finalTitle+" → "+publishedNames.join(", "),"success");
+  addLog("Опубликован «"+r.gameName+"» ("+publishedNames.join(", ")+")","success");
+  addFeed((state.myGroup==="solo"?state.rgName:group.icon+" "+group.name)+" выпустил «"+r.gameName+"»");
+  switchTab("dists");
+  updateQuestProgress("publish",1);
+  if(r.opts.lang==="ru_voice")updateQuestProgress("ru_voice",1);
+  if(r.denuvo&&!r.denuvoFail)updateQuestProgress("denuvo",1);
+  if(r.opts.monet==="none")updateQuestProgress("clean",1);
+  if(r.customTitle)updateQuestProgress("custom",1);
+  checkAchievements();
+}
+
+function gameTick(){
+  if(state.banned)return;
+  var now=Date.now();
+  var dt=Math.min(30,(now-state.lastTick)/1000);
+  state.lastTick=now;
+  var changed=false;
+
+  // Loan interest
+  if(state.loan){
+    state.loan.amount*=(1+state.loan.rate/100*(dt/60));
+    if(state.loan.amount>state.money*3&&Math.random()<0.01){
+      toast("⚠️ Коллекторы угрожают","danger");
+      state.rep=Math.max(0,state.rep-1);
+    }
+  }
+
+  // Investments mature
+  if(state.investments&&state.investments.length){
+    var remain=[];
+    for(var ii=0;ii<state.investments.length;ii++){
+      var inv=state.investments[ii];
+      if(now>=inv.readyAt){
+        var mult=0.5+Math.random()*1.2;
+        if(inv.amount>=8000)mult=0.2+Math.random()*2.5;
+        var ret=Math.round(inv.amount*mult);
+        state.money+=ret;
+        state.totalIncome+=Math.max(0,ret-inv.amount);
+        toast((ret>=inv.amount?"📈":"📉")+" Инвестиция: $"+fmt(ret),"success");
+        addLog("Инвестиция вернула $"+ret,"success");
+        changed=true;
+      } else remain.push(inv);
+    }
+    state.investments=remain;
+  }
+
+  // Custom tablet life decay
+  if(state.customTablet&&state.customTablet.lifeDays!==undefined){
+    state.customTablet.lifeDays-=dt/86400;
+    if(state.customTablet.lifeDays<=0){
+      toast("💀 Твоя таблетка «умерла» — нужна новая","danger");
+      addLog("Таблетка устарела","danger");
+      state.customTablet=null;
+      for(var ti=0;ti<OPTIONS.tablet.length;ti++){
+        if(OPTIONS.tablet[ti].id==="custom"){
+          OPTIONS.tablet[ti].label="Своя";
+          OPTIONS.tablet[ti].quality=4;
+          OPTIONS.tablet[ti].stability=5;
+          OPTIONS.tablet[ti].appeal=10;
+        }
+      }
+    }
+  }
+
+  // Site passive income
+  if(state.site&&state.site.created){
+    var visMult=1;
+    for(var su=0;su<state.site.upgrades.length;su++){
+      var sup=null;
+      for(var si=0;si<SITE_UPGRADES.length;si++)if(SITE_UPGRADES[si].id===state.site.upgrades[su]){sup=SITE_UPGRADES[si];break;}
+      if(sup&&sup.effect.visitors)visMult*=sup.effect.visitors;
+    }
+    var visitors=Math.round((2+state.rep/10+state.repacks.length*0.3)*visMult*(dt/60)*(0.5+Math.random()));
+    state.site.visitors+=visitors;
+    state.site.totalVisitors+=visitors;
+    var siteIncome=0;
+    for(var su2=0;su2<state.site.upgrades.length;su2++){
+      var sup2=null;
+      for(var si2=0;si2<SITE_UPGRADES.length;si2++)if(SITE_UPGRADES[si2].id===state.site.upgrades[su2]){sup2=SITE_UPGRADES[si2];break;}
+      if(sup2&&sup2.effect.income)siteIncome+=visitors*sup2.effect.income;
+    }
+    if(siteIncome>0){
+      state.money+=siteIncome;
+      state.totalIncome+=siteIncome;
+      state.site.income+=siteIncome;
+      changed=true;
+    }
+    // Site DMCA risk
+    if(Math.random()<0.002*dt){
+      var riskMult=1;
+      for(var sr=0;sr<state.site.upgrades.length;sr++){
+        if(state.site.upgrades[sr]==="cdn")riskMult*=0.4;
+      }
+      if(Math.random()<0.3*riskMult){
+        toast("⚠️ Жалоба на твой сайт!","warning");
+        addLog("Получена жалоба на сайт","warning");
+        state.site.warnings=(state.site.warnings||0)+1;
+        if(state.site.warnings>=3){
+          state.site.created=false;
+          toast("Сайт закрыт за нарушения","danger");
+          addLog("Сайт закрыт","danger");
+        }
+      }
+    }
+  }
+
+  state.patchTimer=(state.patchTimer||0)+dt;
+  if(state.patchTimer>120){
+    state.patchTimer=0;
+    var patchable=[];
+    for(var p=0;p<state.repacks.length;p++){
+      if(state.repacks[p].status==="active"&&Math.random()<.3)patchable.push(state.repacks[p]);
+    }
+    if(patchable.length){
+      var pr=patchable[Math.floor(Math.random()*patchable.length)];
+      pr.gamePatched=true;
+      toast("⚠️ Патч для "+pr.gameName,"warning");
+      addLog("Вышел патч для «"+pr.gameName+"»","warning");
+    }
+  }
+
+  if(Math.random()<.05)generateRivalActivity();
+
+  for(var i=0;i<state.repacks.length;i++){
+    var rp=state.repacks[i];
+    if(rp.status==="dead"||rp.status==="banned")continue;
+    var ageH=(now-rp.publishedAt)/3600000;
+    rp.age=ageH;
+    var rateMult=1;
+    if(ageH<.5)rateMult=.3;
+    else if(ageH<6)rateMult=1.4;
+    else if(ageH<24)rateMult=1;
+    else if(ageH<72)rateMult=.7-(ageH-24)/240;
+    else rateMult=.15*Math.exp(-(ageH-72)/200);
+    if(rp.gamePatched)rateMult*=.35;
+    if(rp.denuvoFail)rateMult*=.3;
+    var rc=0;
+    for(var rv=0;rv<RIVALS.length;rv++)if(Math.random()<.15)rc++;
+    rateMult*=(1-rc*.08);
+
+    var growth=rp.peakRate*rateMult*(dt/60)*(0.6+Math.random()*.8);
+    var maxDl=rp.peakRate*30*(rp.audience||1);
+    var newDl=Math.min(maxDl,rp.downloads+growth);
+    var delta=newDl-rp.downloads;
+    if(delta>0.3){
+      rp.downloads=Math.round(newDl);
+      var earn=delta*rp.incomeMult*(0.4+state.rep/200);
+      rp.income+=earn;state.money+=earn;state.totalIncome+=earn;
+      state.totalDownloads+=Math.round(delta);
+      if(rp.onSite&&state.site)state.site.downloads=(state.site.downloads||0)+Math.round(delta);
+      rp.seeds=Math.max(1,Math.round(rp.seeds+(Math.random()-.45)*3+delta*.003));
+      rp.peers=Math.max(0,Math.round(rp.seeds*(0.2+Math.random()*.3)));
+      if(rp.history.length>20)rp.history.shift();
+      rp.history.push(Math.round(rp.downloads));
+      changed=true;
+      try{maybeReview(rp);maybeComment(rp);maybeEvent(rp);}catch(e){console.error(e);}
+    }
+    if(rp.age>24&&rp.seeds<=1&&Math.random()<.05){
+      rp.status="dead";
+      toast("💀 «"+rp.gameName+"» умерла","warning");
+      addLog("Раздача «"+rp.gameName+"» умерла","warning");
+      changed=true;
+    }
+    if(rp.status==="active"){
+      rp.dmcaTimer-=dt;
+      if(rp.dmcaTimer<=0){
+        rp.dmcaTimer=180+Math.random()*300;
+        if(Math.random()<rp.tracker.dmcaRisk*3)try{triggerDmca(rp);}catch(e){}
+      }
+    }
+    if(rp.ratingCount<80&&Math.random()<.12){
+      var base=(rp.quality/20)*.7+(rp.stability/20)*.3;
+      var stars=base+(Math.random()-.5)*1.2-rp.risk*2;
+      if(rp.denuvoFail)stars-=1.5;
+      stars=Math.max(1,Math.min(5,stars));
+      rp.rating=rp.ratingCount===0?stars:(rp.rating*rp.ratingCount+stars)/(rp.ratingCount+1);
+      rp.ratingCount++;
+      if(stars>=4)state.rep=Math.min(100,state.rep+.05);
+      if(stars<=2)state.rep=Math.max(0,state.rep-.08);
+      changed=true;
+    }
+  }
+  if(changed){
+    updateHeader();
+    var active=document.querySelector(".screen.active");
+    if(active){
+      var id=active.id;
+      if(id==="scr-dists")renderDists();
+      else if(id==="scr-stats")renderStats();
+      else if(id==="scr-myrepacks")renderMyRepacks();
+      else if(id==="scr-comments")renderComments();
+      else if(id==="scr-reviews")renderReviews();
+      else if(id==="scr-feed")renderFeed();
+      // scr-site: не перерисовываем — иначе сбрасываются поля ввода
+      else if(id==="scr-site")updateSiteStatsLive();
+    }
+    checkAchievements();
+    checkQuestsProgress();
+  }
+}
+
+function generateRivalActivity(){
+  var rv=pick(RIVALS),g=pick(GAMES);
+  var actions=[
+    "🆕 "+rv.name+" выпустил репак «"+g.name+"»",
+    "🔧 "+rv.name+" обновил «"+g.name+"» до v2",
+    "⚖️ "+rv.name+" получил DMCA на «"+g.name+"»",
+    "🔥 Репак "+rv.name+" «"+g.name+"» стал хитом",
+    "⭐ "+rv.name+" получил 100 отзывов на «"+g.name+"»"
+  ];
+  addFeed(pick(actions));
+}
+
+function addFeed(msg){
+  state.feed.unshift({msg:msg,time:Date.now()});
+  if(state.feed.length>80)state.feed.length=80;
+}
+
+function maybeReview(rp){
+  var cnt=0;
+  for(var i=0;i<state.reviews.length;i++)if(state.reviews[i].repackId===rp.id)cnt++;
+  if(cnt>22)return;
+  var ageMin=(Date.now()-rp.publishedAt)/60000;
+  var chance=ageMin<5?.25:ageMin<30?.12:.05;
+  if(Math.random()>chance)return;
+  var topics=[];
+  if(rp.opts.monet==="crypto")topics.push({key:"crypto_hate",w:15,s:[1,1]});
+  else if(rp.opts.monet==="sponsor")topics.push({key:"sponsor_hate",w:12,s:[1,2]});
+  else if(rp.opts.monet==="ads")topics.push({key:"ads_hate",w:9,s:[1,2]});
+  else topics.push({key:"no_ads",w:4,s:[4,5]});
+  if(rp.opts.lang==="orig")topics.push({key:"no_lang",w:5,s:[2,3]});
+  else topics.push({key:"lang_ru",w:6,s:[4,5]});
+  if(rp.opts.dlc==="all")topics.push({key:"dlc_full",w:5,s:[5,5]});
+  else if(rp.opts.dlc==="none")topics.push({key:"no_dlc",w:3,s:[2,3]});
+  if(rp.opts.content==="cut"||rp.opts.content==="max_cut")topics.push({key:"cut_content",w:4,s:[3,4]});
+  if(rp.compression>=45)topics.push({key:"size_good",w:5,s:[4,5]});
+  else if(rp.compression<25)topics.push({key:"size_big",w:3,s:[3,4]});
+  if(rp.installTime<=35)topics.push({key:"install_fast",w:5,s:[5,5]});
+  else if(rp.installTime>=80)topics.push({key:"install_slow",w:4,s:[3,4]});
+  if(rp.stability>=90&&rp.quality>=85){topics.push({key:"stable",w:6,s:[5,5]});topics.push({key:"quality_high",w:5,s:[5,5]});}
+  else if(rp.stability<60||rp.quality<50)topics.push({key:"crashes",w:8,s:[1,2]});
+  else if(rp.stability<78)topics.push({key:"minor_bugs",w:4,s:[3,4]});
+  if(rp.opts.install==="offline")topics.push({key:"offline",w:3,s:[4,5]});
+  var avPen=state.upgrades.indexOf("av")>=0?.5:(state.upgrades.indexOf("sign")>=0?.3:1);
+  if(Math.random()<rp.avComplaintChance*avPen)topics.push({key:"av_flag",w:6,s:[2,3]});
+  topics.push({key:"general_pos",w:3,s:[4,5]},{key:"general_neg",w:1,s:[1,2]},{key:"seeds_low",w:2,s:[3,4]});
+
+  var totalW=0;
+  for(var i=0;i<topics.length;i++)totalW+=topics[i].w;
+  var r=Math.random()*totalW,chosen=topics[0];
+  for(var j=0;j<topics.length;j++){r-=topics[j].w;if(r<=0){chosen=topics[j];break;}}
+
+  var pool=REVIEW_POOL[chosen.key]||REVIEW_POOL.general_pos;
+  var text=fill(pick(pool),rp);
+  var stars;
+  if(chosen.s[0]===chosen.s[1])stars=chosen.s[0];
+  else stars=chosen.s[0]+Math.floor(Math.random()*(chosen.s[1]-chosen.s[0]+1));
+  if(state.rep>70&&stars<=2&&Math.random()<.4)stars++;
+  if(state.rep<25&&stars>=4&&Math.random()<.35)stars--;
+  stars=Math.max(1,Math.min(5,stars));
+
+  state.reviews.unshift({
+    id:"rv_"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
+    repackId:rp.id,title:rp.title,user:pick(USERS),
+    stars:stars,text:text,time:Date.now()
+  });
+  if(state.reviews.length>150)state.reviews.length=150;
+}
+
+function fill(tpl,rp){
+  return tpl.replace(/\{size\}/g,rp.size).replace(/\{orig\}/g,rp.origSize)
+    .replace(/\{install\}/g,rp.installTime).replace(/\{quality\}/g,rp.quality);
+}
+
+function maybeComment(rp){
+  var cnt=0;
+  for(var i=0;i<state.comments.length;i++)if(state.comments[i].repackId===rp.id)cnt++;
+  if(cnt>25)return;
+  var ageMin=(Date.now()-rp.publishedAt)/60000;
+  var chance=ageMin<3?.35:ageMin<20?.18:.06;
+  if(Math.random()>chance)return;
+  var pool=[];
+  for(var i=0;i<COMMENTS_POOL.length;i++){
+    var c=COMMENTS_POOL[i];
+    if(!c.cond||c.cond(rp))pool.push(c);
+  }
+  if(!pool.length)return;
+  var totalW=0;
+  for(var j=0;j<pool.length;j++)totalW+=pool[j].w;
+  var r=Math.random()*totalW,chosen=pool[0];
+  for(var k=0;k<pool.length;k++){r-=pool[k].w;if(r<=0){chosen=pool[k];break;}}
+
+  state.comments.unshift({
+    id:"cm_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),
+    repackId:rp.id,title:rp.title,tracker:rp.tracker.name,
+    user:chosen.mod?"Модератор "+rp.tracker.name:pick(USERS),
+    text:pick(chosen.texts),time:Date.now(),isMod:chosen.mod
+  });
+  if(state.comments.length>200)state.comments.length=200;
+  if(chosen.mod&&chosen.key.indexOf("mod_")===0){
+    rp.reported=true;
+    if(state.upgrades.indexOf("legal")<0)state.rep=Math.max(0,state.rep-1);
+  }
+}
+
+function maybeEvent(rp){
+  if(Math.random()>.02)return;
+  var events=[
+    {m:"🔥 Вирусный пост! +"+Math.round(rp.peakRate*.5)+" DL",f:function(){rp.downloads+=Math.round(rp.peakRate*.5);state.rep=Math.min(100,state.rep+1);},t:"success"},
+    {m:"⚠️ Ошибка установщика",f:function(){rp.stability=Math.max(40,rp.stability-5);state.rep=Math.max(0,state.rep-.5);},t:"danger"},
+    {m:"👍 Обзор +репутация",f:function(){state.rep=Math.min(100,state.rep+1.5);},t:"success"},
+    {m:"📉 Сиды упали",f:function(){rp.seeds=Math.max(1,Math.round(rp.seeds*.6));},t:"warning"},
+    {m:"🚀 Наплыв скачиваний!",f:function(){rp.downloads+=Math.round(30+Math.random()*150);},t:"success"}
+  ];
+  var e=pick(events);e.f();toast(e.m,e.t);addLog(e.m,e.t);
+}
+
+function triggerDmca(rp){
+  if(state.banned||currentDmca)return;
+  currentDmca=rp;
+  document.getElementById("sheet-dmca-body").innerHTML=
+    '<div style="margin-bottom:12px"><p>DMCA-жалоба на <strong>'+esc(rp.title)+'</strong> ('+rp.tracker.name+')</p>'
+    +'<p style="color:var(--muted);font-size:12px;margin-top:6px">Страйки: '+state.dmcaStrikes+'/3</p></div>'
+    +'<div class="prev-row"><span class="k">Скачиваний</span><span class="v">'+fmt(rp.downloads)+'</span></div>'
+    +'<div class="prev-row"><span class="k">Доход</span><span class="v">$'+fmt(Math.round(rp.income))+'</span></div>';
+  document.getElementById("sheet-dmca-footer").innerHTML=
+    '<button class="btn btn-danger btn-sm" data-action="resolve-dmca" data-val="delete">🗑 Удалить</button>'
+    +'<button class="btn btn-warn btn-sm" data-action="resolve-dmca" data-val="reupload">♻️ Перезалить ($300)</button>'
+    +'<button class="btn btn-outline btn-sm" data-action="resolve-dmca" data-val="ignore">🚫 Игнор</button>';
+  openSheet("dmca");
+  vibError();
+  addLog("DMCA на «"+rp.gameName+"»","danger");
+}
+
+function clearStrike(){
+  if(state.dmcaStrikes<=0){toast("Нет страйков","warning");return;}
+  if(state.level<3){toast("Нужен 3 уровень","warning");return;}
+  var cost=state.upgrades.indexOf("legal")>=0?2500:5000;
+  if(state.money<cost){toast("Нужно $"+cost,"danger");return;}
+  state.money-=cost;
+  state.dmcaStrikes=Math.max(0,state.dmcaStrikes-1);
+  updateHeader();
+  toast("Страйк снят. Осталось "+state.dmcaStrikes+"/3","success");
+  addLog("Снят страйк ("+state.dmcaStrikes+"/3)","success");
+  sndMoney();
+  renderProfile();
+  saveGame();
+}
+
+function clearBan(){
+  if(!state.banned){toast("Вы не забанены","warning");return;}
+  if(state.money<15000){toast("Нужно $15000","danger");return;}
+  state.money-=15000;
+  state.banned=false;
+  state.dmcaStrikes=0;
+  updateHeader();
+  toast("🔓 Аккаунт разблокирован","success");
+  addLog("Разбан аккаунта","success");
+  sndWin();vibSuccess();
+  renderProfile();
+  saveGame();
+}
+
+function resolveDmca(action){
+  var rp=currentDmca;if(!rp)return;
+  if(action==="delete"){rp.status="banned";toast("Раздача удалена","warning");addLog("Раздача удалена по DMCA","warning");}
+  else if(action==="reupload"){
+    if(state.money<300){toast("Мало денег","danger");return;}
+    state.money-=300;
+    var lm=state.upgrades.indexOf("legal")>=0?2:1;
+    if(Math.random()<.5*lm){toast("Перезалита","success");rp.dmcaTimer=300+Math.random()*300;addLog("Успешный перезалив","success");}
+    else{rp.status="banned";state.dmcaStrikes++;toast("Не удалось. +1 страйк","danger");vibError();addLog("Страйк +1","danger");}
+  } else {
+    state.dmcaStrikes++;
+    toast("Страйк "+state.dmcaStrikes+"/3","danger");
+    addLog("Страйк "+state.dmcaStrikes+"/3 (игнор)","danger");
+    if(state.dmcaStrikes>=3){state.banned=true;toast("❌ АККАУНТ ЗАБАНЕН","danger");addLog("АККАУНТ ЗАБАНЕН","danger");}
+  }
+  updateHeader();currentDmca=null;closeAllSheets();saveGame();checkAchievements();
+}
+
+/* ============================================================
+   SITE SYSTEM
+   ============================================================ */
+function createSite(){
+  if(state.site&&state.site.created){toast("Сайт уже создан","warning");return;}
+  if(state.money<1500){toast("Нужно $1500","danger");return;}
+  if(state.level<2){toast("Нужен 2 уровень","warning");return;}
+  var siteNameEl=document.getElementById("site-name-input");
+  var siteDomainEl=document.getElementById("site-domain-input");
+  var siteName=(siteNameEl?siteNameEl.value.trim():"")||state.rgName+" Repacks";
+  var siteDomain=(siteDomainEl?siteDomainEl.value.trim().toLowerCase().replace(/[^a-z0-9-]/g,""):"")||state.rgName.toLowerCase().replace(/\s+/g,"")+".repack";
+  if(siteDomain.length<3){toast("Домен слишком короткий","warning");return;}
+  if(siteDomain.indexOf(".")<0)siteDomain+=".repack";
+  state.money-=1500;
+  state.site={
+    created:true,
+    title:siteName,
+    name:siteDomain,
+    visitors:0,totalVisitors:0,income:0,downloads:0,upgrades:[],warnings:0,
+    createdAt:Date.now()
+  };
+  updateHeader();
+  toast("🌐 Сайт «"+siteName+"» создан!","success");
+  addLog("Создан сайт "+siteDomain,"success");
+  sndMoney();vibSuccess();
+  renderSite();
+  checkAchievements();
+  saveGame();
+}
+
+function buySiteUpgrade(id){
+  if(!state.site||!state.site.created)return;
+  var up=null;
+  for(var i=0;i<SITE_UPGRADES.length;i++)if(SITE_UPGRADES[i].id===id){up=SITE_UPGRADES[i];break;}
+  if(!up)return;
+  if(state.site.upgrades.indexOf(id)>=0){toast("Уже куплено","warning");return;}
+  if(state.money<up.cost){toast("Мало денег","danger");return;}
+  state.money-=up.cost;
+  state.site.upgrades.push(id);
+  updateHeader();
+  toast("Куплено: "+up.name,"success");
+  addLog("Апгрейд сайта: "+up.name,"success");
+  sndMoney();
+  renderSite();
+  saveGame();
+}
+
+function changeSiteDomain(){
+  if(!state.site||!state.site.created)return;
+  if(state.money<300){toast("Нужно $300","danger");return;}
+  var el=document.getElementById("edit-site-domain");
+  var domain=(el?el.value.trim().toLowerCase().replace(/[^a-z0-9.-]/g,""):"");
+  if(domain.length<3){toast("Домен слишком короткий","warning");return;}
+  if(domain.indexOf(".")<0)domain+=".repack";
+  if(domain===state.site.name){toast("Это текущий домен","warning");return;}
+  state.money-=300;
+  var old=state.site.name;
+  state.site.name=domain;
+  // temporary traffic dip after domain change
+  state.site.visitors=Math.round(state.site.visitors*0.6);
+  updateHeader();
+  toast("Домен: "+old+" → "+domain,"success");
+  addLog("Смена домена: "+domain,"success");
+  sndMoney();
+  renderSite();
+  saveGame();
+}
+
+function changeSiteTitle(){
+  if(!state.site||!state.site.created)return;
+  if(state.money<50){toast("Нужно $50","danger");return;}
+  var el=document.getElementById("edit-site-title");
+  var title=(el?el.value.trim():"");
+  if(title.length<2){toast("Название слишком короткое","warning");return;}
+  state.money-=50;
+  state.site.title=title;
+  updateHeader();
+  toast("Название обновлено","success");
+  addLog("Смена названия сайта: "+title,"success");
+  renderSite();
+  saveGame();
+}
+
+function renderSite(){
+  var el=document.getElementById("site-content");
+  if(!state.site||!state.site.created){
+    el.innerHTML='<div class="empty"><div class="ic">🌐</div><div class="tx">У тебя ещё нет сайта</div></div>'
+      +'<div class="card"><p style="font-size:13px;color:var(--muted);margin-bottom:12px">Создай свой сайт репаков. Пассивный трафик, доход и возможность публиковать репаки напрямую.</p>'
+      +'<div class="opt-group-h">Название сайта</div>'
+      +'<input type="text" class="title-input mb8" id="site-name-input" placeholder="'+esc(state.rgName)+' Repacks" maxlength="40">'
+      +'<div class="opt-group-h">Домен</div>'
+      +'<input type="text" class="title-input mb8" id="site-domain-input" placeholder="'+esc((state.rgName||"my").toLowerCase().replace(/\\s+/g,""))+'.repack" maxlength="30">'
+      +'<div class="char-hint" style="margin-bottom:12px">Можно .repack / .to / .games / .download</div>'
+      +'<div class="prev-row"><span class="k">Стоимость</span><span class="v">$1 500</span></div>'
+      +'<div class="prev-row"><span class="k">Требование</span><span class="v">Уровень 2</span></div>'
+      +'<button class="btn btn-success btn-block mt12" data-action="create-site">🌐 Создать сайт</button></div>';
+    return;
+  }
+  var s=state.site;
+  var h='<div class="site-preview">'
+    +'<div style="font-weight:700;font-size:15px;margin-bottom:4px">'+esc(s.title||s.name)+'</div>'
+    +'<div class="site-url">https://'+esc(s.name)+'</div>'
+    +'<div class="site-stat-row"><span>Посетители сейчас</span><span class="bold">'+fmt(s.visitors)+'</span></div>'
+    +'<div class="site-stat-row"><span>Всего посетителей</span><span class="bold">'+fmt(s.totalVisitors)+'</span></div>'
+    +'<div class="site-stat-row"><span>Скачиваний с сайта</span><span class="bold">'+fmt(s.downloads||0)+'</span></div>'
+    +'<div class="site-stat-row"><span>Доход с сайта</span><span class="success bold">$'+fmt(Math.round(s.income))+'</span></div>'
+    +'<div class="site-stat-row"><span>Предупреждения</span><span class="'+(s.warnings>0?"danger":"")+'">'+s.warnings+'/3</span></div>'
+    +'</div>';
+
+  h+='<div class="panel"><div class="panel-h">✏️ Название и домен</div><div class="panel-b">'
+    +'<div class="opt-group-h">Название сайта</div>'
+    +'<input type="text" class="title-input mb8" id="edit-site-title" value="'+esc(s.title||"")+'" maxlength="40">'
+    +'<button class="btn btn-outline btn-sm btn-block mb12" data-action="change-site-title">💾 Сменить название ($50)</button>'
+    +'<div class="opt-group-h">Домен</div>'
+    +'<input type="text" class="title-input mb8" id="edit-site-domain" value="'+esc(s.name)+'" maxlength="30">'
+    +'<div class="char-hint" style="margin-bottom:8px">.repack / .to / .games / .download / .torrent</div>'
+    +'<button class="btn btn-outline btn-sm btn-block" data-action="change-domain">🌐 Сменить домен ($300)</button>'
+    +'</div></div>';
+
+  h+='<div class="panel"><div class="panel-h">🔧 Апгрейды сайта</div><div class="panel-b">';
+  for(var i=0;i<SITE_UPGRADES.length;i++){
+    var up=SITE_UPGRADES[i];
+    var owned=s.upgrades.indexOf(up.id)>=0;
+    h+='<div class="shop-it">'
+      +'<div class="info"><div class="nm">'+up.name+(owned?' <span class="tag success">КУПЛЕНО</span>':'')+'</div>'
+      +'<div class="ds">'+up.desc+'</div></div>'
+      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">'
+      +'<span class="price">$'+fmt(up.cost)+'</span>'
+      +'<button class="btn btn-sm '+(owned?"":"btn-success")+'" '+(owned?"disabled":'data-action="buy-site-up" data-val="'+up.id+'"')+'>'+(owned?"✓":"Купить")+'</button>'
+      +'</div></div>';
+  }
+  h+='</div></div>';
+  el.innerHTML=h;
+}
+
+/* ============================================================
+   QUESTS / ACH / ETC
+   ============================================================ */
+function checkDailyQuests(){
+  var today=Math.floor(Date.now()/86400000);
+  if(state.questDay!==today){
+    state.questDay=today;
+    state.currentQuests=[];
+    var pool=QUESTS.slice();
+    for(var i=0;i<3;i++){
+      var idx=Math.floor(Math.random()*pool.length);
+      var q=pool.splice(idx,1)[0];
+      state.currentQuests.push({id:q.id,name:q.name,desc:q.desc,reward:q.reward,target:q.target,type:q.type,progress:0,done:false,claimed:false});
+    }
+    state.questProgress={};
+    saveGame();
+  }
+  renderQuests();
+}
+
+function updateQuestProgress(type,amount){
+  if(!state.questProgress)state.questProgress={};
+  state.questProgress[type]=(state.questProgress[type]||0)+(amount||1);
+  checkQuestsProgress();
+}
+
+function checkQuestsProgress(){
+  var ch=false;
+  for(var i=0;i<state.currentQuests.length;i++){
+    var q=state.currentQuests[i];
+    if(q.done)continue;
+    var prog=(state.questProgress&&state.questProgress[q.type])||0;
+    q.progress=prog;
+    if(prog>=q.target){q.done=true;ch=true;toast("✅ Задание готово: "+q.name,"success");}
+  }
+  if(ch){renderQuests();saveGame();}
+  updateQuestBadge();
+}
+
+function claimQuest(id){
+  for(var i=0;i<state.currentQuests.length;i++){
+    var q=state.currentQuests[i];
+    if(q.id===id&&q.done&&!q.claimed){
+      q.claimed=true;state.money+=q.reward;
+      state.questsDone=(state.questsDone||0)+1;
+      state.xp+=20;checkLevel();
+      updateHeader();sndMoney();vibSuccess();
+      toast("💰 +$"+q.reward,"success");
+      addLog("Задание выполнено: "+q.name,"success");
+      renderQuests();checkAchievements();saveGame();
+      return;
+    }
+  }
+}
+
+function updateQuestBadge(){
+  var b=document.getElementById("badge-quest");
+  if(!b)return;
+  var n=0;
+  for(var i=0;i<state.currentQuests.length;i++)if(state.currentQuests[i].done&&!state.currentQuests[i].claimed)n++;
+  if(n>0){b.style.display="flex";b.textContent=n;}
+  else b.style.display="none";
+}
+
+function checkAchievements(){
+  var newOnes=false;
+  for(var i=0;i<ACHIEVEMENTS.length;i++){
+    var a=ACHIEVEMENTS[i];
+    if(state.achievements.indexOf(a.id)>=0)continue;
+    if(a.check(state)){
+      state.achievements.push(a.id);
+      toast("🏆 "+a.icon+" "+a.name,"gold");
+      vibGold();
+      addLog("Достижение: "+a.name,"gold");
+      newOnes=true;
+    }
+  }
+  if(newOnes){renderAch();saveGame();}
+}
+
+function applyOfflineProgress(){
+  var now=Date.now();
+  var dt=(now-state.lastTick)/1000;
+  if(dt<60)return;
+  dt=Math.min(dt,3600);
+  var mins=dt/60,earned=0,dl=0;
+  for(var i=0;i<state.repacks.length;i++){
+    var rp=state.repacks[i];
+    if(rp.status!=="active")continue;
+    var d=rp.peakRate*.3*mins;
+    rp.downloads+=Math.round(d);
+    var e=d*rp.incomeMult*.3;
+    rp.income+=e;earned+=e;dl+=d;
+  }
+  if(earned>0){
+    state.money+=earned;state.totalIncome+=earned;state.totalDownloads+=Math.round(dl);
+    setTimeout(function(){toast("📴 Оффлайн: +$"+fmt(Math.round(earned))+" ("+fmt(Math.round(dl))+" DL)","success");},1000);
+  }
+}
+
+function statusLabel(s){
+  if(s==="active")return "активна";
+  if(s==="dead")return "мертва";
+  if(s==="banned")return "снята";
+  return s;
+}
+
+function renderMyRepacks(){
+  var el=document.getElementById("list-myrepacks");
+  if(!state.repacks.length){el.innerHTML='<div class="empty"><div class="ic">📦</div><div class="tx">Пока нет репаков</div></div>';return;}
+  var h="";
+  for(var i=state.repacks.length-1;i>=0;i--){
+    var r=state.repacks[i];
+    h+='<div class="card">'
+      +'<div class="flex mb8" style="justify-content:space-between;align-items:flex-start"><div class="bold" style="flex:1;font-size:14px">'+esc(r.title)+'</div>'
+      +'<span class="tag '+(r.status==="dead"?"dead":"success")+'">'+statusLabel(r.status)+'</span></div>'
+      +'<div class="gc-meta">'
+      +'<div><span class="k">Трекер:</span> <span class="v">'+r.tracker.flag+' '+r.tracker.name+'</span></div>'
+      +'<div><span class="k">Размер:</span> <span class="v">'+r.size+' GB</span></div>'
+      +'<div><span class="k">DL:</span> <span class="v">'+fmt(r.downloads)+'</span></div>'
+      +'<div><span class="k">★:</span> <span class="v stars">'+(r.ratingCount?r.rating.toFixed(1):"—")+'</span></div>'
+      +'<div><span class="k">Доход:</span> <span class="v success">$'+fmt(Math.round(r.income))+'</span></div>'
+      +'<div><span class="k">Кач:</span> <span class="v">'+r.quality+'/100</span></div>'
+      +'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function renderDists(){
+  var el=document.getElementById("list-dists");
+  var active=[];
+  for(var i=0;i<state.repacks.length;i++)if(state.repacks[i].status!=="banned")active.push(state.repacks[i]);
+  if(!active.length){el.innerHTML='<div class="empty"><div class="ic">📡</div><div class="tx">Нет активных раздач</div></div>';return;}
+  var h="";
+  for(var j=active.length-1;j>=0;j--){
+    var r=active[j];
+    var sparkHtml="";
+    if(r.history&&r.history.length>2){
+      var maxH=Math.max.apply(null,r.history)||1;
+      sparkHtml='<div class="spark">';
+      for(var si=0;si<r.history.length;si++){
+        var ht=Math.max(2,Math.round((r.history[si]/maxH)*28));
+        sparkHtml+='<span style="height:'+ht+'px"></span>';
+      }
+      sparkHtml+='</div>';
+    }
+    h+='<div class="card">'
+      +'<div class="flex mb8" style="justify-content:space-between;align-items:flex-start"><div class="bold" style="flex:1;font-size:14px">'+esc(r.title)+'</div>'
+      +(r.gamePatched?'<span class="tag hot">ПАТЧ</span>':'')
+      +'</div>'
+      +'<div class="flex mb8" style="gap:6px;flex-wrap:wrap">'
+      +'<span class="tag">'+r.tracker.flag+' '+r.tracker.name+'</span>'
+      +'<span class="tag '+(r.status==="dead"?"dead":"success")+'">'+statusLabel(r.status)+'</span>'
+      +'<span class="tag">'+Math.round(r.age)+'ч</span>'
+      +'</div>'
+      +'<div class="gc-meta">'
+      +'<div><span class="k">Сиды:</span> <span class="v success">'+fmt(r.seeds)+'</span></div>'
+      +'<div><span class="k">DL:</span> <span class="v">'+fmt(r.downloads)+'</span></div>'
+      +'<div><span class="k">★:</span> <span class="v stars">'+(r.ratingCount?r.rating.toFixed(1):"—")+'</span></div>'
+      +'<div><span class="k">Доход:</span> <span class="v success">$'+fmt(Math.round(r.income))+'</span></div>'
+      +'</div>'
+      +sparkHtml
+      +(r.gamePatched?'<button class="btn btn-warn btn-sm btn-block mt8" data-action="release-patch" data-val="'+r.id+'">🔧 Патч игры v'+(r.patchVersion+1)+' ($150)</button>':'')
+      +'<button class="btn btn-outline btn-sm btn-block mt8" data-action="upgrade-repack" data-val="'+r.id+'">⬆ Улучшить репак v'+(r.patchVersion||1)+' → v'+((r.patchVersion||1)+1)+' ($'+(200+(r.patchVersion||1)*100)+')</button>'
+      +'</div>';
+  }
+  el.innerHTML=h;
+}
+
+function releasePatch(id){
+  var rp=null;
+  for(var i=0;i<state.repacks.length;i++)if(state.repacks[i].id===id){rp=state.repacks[i];break;}
+  if(!rp)return;
+  if(state.money<150){toast("Нужно $150","danger");sndBad();return;}
+  state.money-=150;rp.gamePatched=false;rp.patchVersion++;rp.publishedAt=Date.now();rp.age=0;rp.status="active";
+  rp.seeds=Math.max(rp.seeds,10);
+  state.rep=Math.min(100,state.rep+1);
+  updateHeader();renderDists();saveGame();sndOk();vibSuccess();
+  toast("Патч v"+rp.patchVersion,"success");
+  addLog("Патч v"+rp.patchVersion+" для «"+rp.gameName+"»","success");
+  updateQuestProgress("patch",1);
+}
+
+function renderComments(){
+  var el=document.getElementById("list-comments");
+  if(!state.comments.length){el.innerHTML='<div class="empty"><div class="ic">💬</div><div class="tx">Пока нет комментариев</div></div>';return;}
+  var h="";
+  for(var i=0;i<Math.min(50,state.comments.length);i++){
+    var c=state.comments[i];
+    h+='<div class="msg '+(c.isMod?"mod":"")+'">'
+      +'<div class="msg-h"><span class="msg-user">'+esc(c.user)+' <span class="muted" style="font-weight:400;font-size:11px">· '+c.tracker+'</span></span>'
+      +'<span class="msg-time">'+timeAgo(c.time)+'</span></div>'
+      +'<div class="msg-title">'+esc(c.title)+'</div>'
+      +'<div class="msg-text">'+esc(c.text)+'</div>';
+    if(c.replied){
+      h+='<div style="margin-top:8px;padding:8px;background:rgba(74,139,229,.1);border-radius:8px;font-size:12px"><strong>Вы:</strong> '+esc(c.replyText)+'</div>';
+    } else if(!c.isMod){
+      h+='<button class="btn btn-sm btn-outline mt8" data-action="reply-comment" data-val="'+c.id+'">↩ Ответить</button>';
+    }
+    h+='</div>';
+  }
+  el.innerHTML=h;
+}
+
+function renderReviews(){
+  var el=document.getElementById("list-reviews");
+  if(!state.reviews.length){el.innerHTML='<div class="empty"><div class="ic">⭐</div><div class="tx">Пока нет отзывов</div></div>';return;}
+  var h="";
+  for(var i=0;i<Math.min(50,state.reviews.length);i++){
+    var r=state.reviews[i];
+    h+='<div class="msg">'
+      +'<div class="msg-h"><span><span class="stars">'+"★".repeat(r.stars)+"☆".repeat(5-r.stars)+'</span> <strong style="margin-left:6px">'+esc(r.user)+'</strong></span>'
+      +'<span class="msg-time">'+timeAgo(r.time)+'</span></div>'
+      +'<div class="msg-title">'+esc(r.title)+'</div>'
+      +'<div class="msg-text">'+esc(r.text)+'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function renderStats(){
+  var totalRep=state.repacks.length;
+  var rated=0,sum=0;
+  for(var i=0;i<state.repacks.length;i++)if(state.repacks[i].ratingCount>0){rated++;sum+=state.repacks[i].rating;}
+  var avg=rated?(sum/rated).toFixed(1):"—";
+  var days=Math.max(1,Math.floor((Date.now()-(state.startedAt||Date.now()))/86400000));
+  document.getElementById("stats-grid").innerHTML=
+    '<div class="stat"><div class="n">'+fmt(state.totalDownloads)+'</div><div class="l">Скачиваний</div></div>'
+    +'<div class="stat"><div class="n">$'+fmt(Math.round(state.totalIncome))+'</div><div class="l">Заработано</div></div>'
+    +'<div class="stat"><div class="n">'+totalRep+'</div><div class="l">Репаков</div></div>'
+    +'<div class="stat"><div class="n">'+avg+'</div><div class="l">Ср. рейтинг</div></div>'
+    +'<div class="stat"><div class="n">'+state.rep.toFixed(0)+'</div><div class="l">Репутация</div></div>'
+    +'<div class="stat"><div class="n">'+state.level+'</div><div class="l">Уровень</div></div>'
+    +'<div class="stat"><div class="n">'+(state.denuvoWins||0)+'</div><div class="l">Denuvo</div></div>'
+    +'<div class="stat"><div class="n">'+days+'</div><div class="l">Дней в сцене</div></div>';
+  var el=document.getElementById("list-stats");
+  if(!state.repacks.length){el.innerHTML='<div class="empty"><div class="tx">Нет данных</div></div>';return;}
+  var h="";
+  for(var j=state.repacks.length-1;j>=0;j--){
+    var r=state.repacks[j];
+    h+='<div class="list-item"><div class="left"><div class="name">'+r.groupIcon+' '+esc(r.gameName)+'</div>'
+      +'<div class="sub">'+r.tracker.flag+' '+r.tracker.name+' · '+fmt(r.downloads)+' DL</div></div>'
+      +'<div class="right"><div class="success bold">$'+fmt(Math.round(r.income))+'</div>'
+      +'<div class="sub stars">'+(r.ratingCount?r.rating.toFixed(1)+"★":"—")+'</div></div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function renderScene(){
+  var g=GROUPS[0];
+  for(var i=0;i<GROUPS.length;i++)if(GROUPS[i].id===state.myGroup){g=GROUPS[i];break;}
+  var h='<div class="prev-row"><span class="k">Группа</span><span class="v">'+g.icon+' '+(state.myGroup==="solo"?state.rgName:g.name)+'</span></div>'
+    +'<div class="prev-row"><span class="k">Охват</span><span class="v">×'+g.mult+'</span></div>'
+    +'<div class="prev-row"><span class="k">Отчисления</span><span class="v">'+Math.round(g.incomeCut*100)+'%</span></div>'
+    +'<div class="opt-group-h mt12">Сменить группу</div><div class="grid2">';
+  for(var j=0;j<GROUPS.length;j++){
+    var gr=GROUPS[j];
+    var can=gr.unlockLvl<=state.level;
+    h+='<div class="grp '+(state.myGroup===gr.id?"selected":"")+'" '
+      +(can?'data-action="join-group" data-val="'+gr.id+'"':'')
+      +' style="'+(can?"":"opacity:.5")+'">'
+      +'<div class="nm">'+gr.icon+' '+gr.name+'</div>'
+      +'<div class="ds">'+gr.desc+' · ×'+gr.mult+' · ур. '+gr.unlockLvl+'</div>'
+      +'</div>';
+  }
+  h+='</div>';
+  document.getElementById("my-group").innerHTML=h;
+
+  var sorted=RIVALS.slice().sort(function(a,b){return b.rep-a.rep;});
+  var rh="";
+  for(var k=0;k<sorted.length;k++){
+    var rv=sorted[k];
+    var grp=GROUPS[0];
+    for(var m=0;m<GROUPS.length;m++)if(GROUPS[m].id===rv.group){grp=GROUPS[m];break;}
+    rh+='<div class="list-item"><div class="left"><div class="name">#'+(k+1)+' '+grp.icon+' '+rv.name+'</div>'
+      +'<div class="sub">'+rv.style+'</div></div>'
+      +'<div class="right bold">'+rv.rep+' REP</div></div>';
+  }
+  document.getElementById("list-rivals").innerHTML=rh;
+}
+
+function joinGroup(id){
+  var g=null;
+  for(var i=0;i<GROUPS.length;i++)if(GROUPS[i].id===id){g=GROUPS[i];break;}
+  if(!g||g.unlockLvl>state.level)return;
+  state.myGroup=id;
+  if(state.groupsVisited.indexOf(id)<0)state.groupsVisited.push(id);
+  toast("Вступил в "+g.name,"success");sndOk();vibSuccess();
+  addLog("Вступил в группу "+g.name,"success");
+  renderScene();checkAchievements();saveGame();
+}
+
+function renderShop(){
+  var el=document.getElementById("list-shop");
+  var h="";
+  for(var i=0;i<SHOP.length;i++){
+    var it=SHOP[i];
+    var owned=state.upgrades.indexOf(it.id)>=0;
+    var can=!owned&&state.money>=it.cost&&state.level>=it.reqLvl;
+    h+='<div class="shop-it">'
+      +'<div class="info"><div class="nm">'+it.name+(owned?' <span class="tag success">КУПЛЕНО</span>':'')+'</div>'
+      +'<div class="ds">'+it.desc+' · ур. '+it.reqLvl+'</div></div>'
+      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">'
+      +'<span class="price">$'+fmt(it.cost)+'</span>'
+      +'<button class="btn btn-sm '+(owned?"":"btn-success")+'" '
+      +(owned||!can?'disabled':'data-action="buy-upgrade" data-val="'+it.id+'"')
+      +'>'+(owned?"✓":"Купить")+'</button>'
+      +'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function buyUpgrade(id){
+  var it=findUpgrade(id);
+  if(!it||state.upgrades.indexOf(id)>=0)return;
+  if(state.money<it.cost){toast("Мало денег","danger");sndBad();vibError();return;}
+  if(state.level<it.reqLvl){toast("Нужен уровень "+it.reqLvl,"warning");return;}
+  state.money-=it.cost;state.upgrades.push(id);
+  updateHeader();renderShop();saveGame();sndMoney();vibSuccess();
+  toast("Куплено: "+it.name,"success");
+  addLog("Куплен апгрейд: "+it.name,"success");
+}
+
+function renderProfile(){
+  var el=document.getElementById("profile-body");
+  var g=GROUPS[0];
+  for(var j=0;j<GROUPS.length;j++)if(GROUPS[j].id===state.myGroup){g=GROUPS[j];break;}
+  var days=Math.max(1,Math.floor((Date.now()-(state.startedAt||Date.now()))/86400000));
+  el.innerHTML=
+    '<div class="prof-row"><span class="k">Ник</span><span class="v">'+esc(state.nick)+'</span></div>'
+    +'<div class="prof-row"><span class="k">R.G.</span><span class="v">'+esc(state.rgName)+'</span></div>'
+    +'<div class="prof-row"><span class="k">Группа</span><span class="v">'+g.icon+' '+(state.myGroup==="solo"?state.rgName:g.name)+'</span></div>'
+    +'<div class="prof-row"><span class="k">Уровень</span><span class="v">'+state.level+'</span></div>'
+    +'<div class="prof-row"><span class="k">Опыт</span><span class="v">'+state.xp+' / '+(state.level*50)+'</span></div>'
+    +'<div class="prof-row"><span class="k">Репутация</span><span class="v">'+state.rep.toFixed(1)+' / 100</span></div>'
+    +'<div class="prof-row"><span class="k">Деньги</span><span class="v success">$'+fmt(Math.round(state.money))+'</span></div>'
+    +'<div class="prof-row"><span class="k">Страйки</span><span class="v '+(state.dmcaStrikes>0?"danger":"")+'">'+state.dmcaStrikes+' / 3</span></div>'
+    +(state.dmcaStrikes>0||state.banned?
+      '<div style="margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)">'
+      +'<div class="muted" style="font-size:12px;margin-bottom:8px">Снять страйк: $'+(state.upgrades.indexOf("legal")>=0?2500:5000)+' · ур. 3+</div>'
+      +'<button class="btn btn-outline btn-sm btn-block mb8" data-action="clear-strike">⚖️ Снять 1 страйк</button>'
+      +(state.banned?'<button class="btn btn-danger btn-sm btn-block" data-action="clear-ban">🔓 Разбан ($15 000)</button>':'')
+      +'</div>':'')
+    +'<div class="prof-row"><span class="k">Репаков</span><span class="v">'+state.repacks.length+'</span></div>'
+    +'<div class="prof-row"><span class="k">Denuvo</span><span class="v">'+(state.denuvoWins||0)+'</span></div>'
+    +'<div class="prof-row"><span class="k">Скачиваний</span><span class="v">'+fmt(state.totalDownloads)+'</span></div>'
+    +'<div class="prof-row"><span class="k">Дней в сцене</span><span class="v">'+days+'</span></div>'
+    +'<div class="prof-row"><span class="k">Достижений</span><span class="v">'+state.achievements.length+' / '+ACHIEVEMENTS.length+'</span></div>'
+    +(state.banned?'<div class="prof-row"><span class="k danger">СТАТУС</span><span class="v danger">❌ ЗАБАНЕН</span></div>':'');
+}
+
+function renderSettings(){
+  var el=document.getElementById("settings-body");
+  el.innerHTML=
+    '<div class="toggle-row"><span>Звуки</span><button class="toggle '+(state.settings.sound?"on":"")+'" data-action="toggle-sound"></button></div>'
+    +'<div class="toggle-row"><span>Вибрация</span><button class="toggle '+(state.settings.vibrate?"on":"")+'" data-action="toggle-vibrate"></button></div>';
+}
+
+function toggleSetting(key){
+  state.settings[key]=!state.settings[key];
+  renderSettings();
+  saveGame();
+  vibTap();
+}
+
+function renderQuests(){
+  var el=document.getElementById("list-quests");
+  if(!el)return;
+  var dateEl=document.getElementById("quest-date");
+  if(dateEl)dateEl.textContent=new Date().toLocaleDateString("ru-RU");
+  if(!state.currentQuests||!state.currentQuests.length){el.innerHTML='<div class="empty"><div class="tx">Нет заданий</div></div>';return;}
+  var h="";
+  for(var i=0;i<state.currentQuests.length;i++){
+    var q=state.currentQuests[i];
+    var prog=Math.min(q.target,q.progress||0);
+    var pct=Math.round(prog/q.target*100);
+    h+='<div class="quest '+(q.claimed?"done":"")+'">'
+      +'<div class="nm">'+q.name+'</div>'
+      +'<div class="ds">'+q.desc+' · награда $'+q.reward+'</div>'
+      +'<div class="pbar"><div class="pfill '+(q.done?"g":"")+'" style="width:'+pct+'%"></div></div>'
+      +'<div class="flex" style="justify-content:space-between;margin-top:8px">'
+      +'<span class="muted" style="font-size:12px">'+prog+' / '+q.target+'</span>'
+      +(q.done&&!q.claimed?'<button class="btn btn-sm btn-success" data-action="claim-quest" data-val="'+q.id+'">💰 Забрать $'+q.reward+'</button>':'')
+      +(q.claimed?'<span class="success bold" style="font-size:12px">✓ Получено</span>':'')
+      +'</div></div>';
+  }
+  el.innerHTML=h;
+  updateQuestBadge();
+}
+
+function renderAch(){
+  var el=document.getElementById("list-ach");
+  if(!el)return;
+  var c=document.getElementById("ach-count");
+  if(c)c.textContent=state.achievements.length+" / "+ACHIEVEMENTS.length;
+  var h="";
+  for(var i=0;i<ACHIEVEMENTS.length;i++){
+    var a=ACHIEVEMENTS[i];
+    var got=state.achievements.indexOf(a.id)>=0;
+    h+='<div class="ach '+(got?"":"locked")+'">'
+      +'<div class="ic">'+(got?a.icon:"🔒")+'</div>'
+      +'<div class="info"><div class="nm">'+a.name+'</div><div class="ds">'+a.desc+'</div></div>'
+      +'</div>';
+  }
+  el.innerHTML=h;
+}
+
+function renderFeed(){
+  var el=document.getElementById("list-feed");
+  if(!el)return;
+  if(!state.feed.length){el.innerHTML='<div class="empty"><div class="ic">🌐</div><div class="tx">Лента пуста</div></div>';return;}
+  var h="";
+  for(var i=0;i<Math.min(50,state.feed.length);i++){
+    var f=state.feed[i];
+    h+='<div class="list-item"><div class="left"><div style="font-size:13px">'+esc(f.msg)+'</div></div>'
+      +'<div class="right muted" style="font-size:11px">'+timeAgo(f.time)+'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function renderLog(){
+  var el=document.getElementById("list-log");
+  if(!state.eventLog.length){el.innerHTML='<div class="empty"><div class="ic">📜</div><div class="tx">Журнал пуст</div></div>';return;}
+  var h="";
+  for(var i=0;i<Math.min(60,state.eventLog.length);i++){
+    var e=state.eventLog[i];
+    h+='<div class="event-item"><div>'+esc(e.msg)+'</div><div class="event-time">'+timeAgo(e.time)+'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+/* ============================================================
+   TABLET LAB / DARK OPS / FINANCE / REPLIES
+   ============================================================ */
+function renderTabletLab(){
+  var el=document.getElementById("tablet-content");
+  var h='';
+  if(!state.customTablet){
+    h+='<div class="empty"><div class="ic">⚡</div><div class="tx">Своя таблетка ещё не создана</div></div>'
+      +'<div class="card"><p style="font-size:13px;color:var(--muted);margin-bottom:12px">Создай собственную таблетку под брендом своей R.G. Качество зависит от уровня.</p>'
+      +'<div class="opt-group-h">Название таблетки</div>'
+      +'<input type="text" class="title-input mb8" id="tablet-name-input" placeholder="'+esc(state.rgName||"MY")+'-CRACK" maxlength="16">'
+      +'<div class="prev-row"><span class="k">Стоимость</span><span class="v">$5 000</span></div>'
+      +'<div class="prev-row"><span class="k">Требование</span><span class="v">Уровень 4</span></div>'
+      +'<button class="btn btn-success btn-block mt12" data-action="create-tablet">⚡ Создать таблетку</button></div>';
+  } else {
+    var t=state.customTablet;
+    h+='<div class="card">'
+      +'<div class="bold" style="font-size:18px;margin-bottom:8px">⚡ '+esc(t.name)+'</div>'
+      +'<div class="prev-row"><span class="k">Качество</span><span class="v">+'+t.quality+'</span></div>'
+      +'<div class="prev-row"><span class="k">Стабильность</span><span class="v">+'+t.stability+'</span></div>'
+      +'<div class="prev-row"><span class="k">Привлекательность</span><span class="v">+'+t.appeal+'</span></div>'
+      +'<div class="prev-row"><span class="k">Уровень</span><span class="v">'+t.level+'</span></div>'
+      +'<div class="prev-row"><span class="k">Срок жизни</span><span class="v">'+(t.lifeDays||30)+' дн.</span></div>'
+      +'</div>'
+      +'<button class="btn btn-outline btn-block" data-action="upgrade-tablet">🔧 Улучшить ($'+(3000+t.level*1500)+')</button>';
+  }
+  el.innerHTML=h;
+}
+
+function createCustomTablet(){
+  if(state.customTablet){toast("Уже есть","warning");return;}
+  if(state.level<4){toast("Нужен 4 уровень","warning");return;}
+  if(state.money<5000){toast("Нужно $5000","danger");return;}
+  var nameEl=document.getElementById("tablet-name-input");
+  var name=(nameEl?nameEl.value.trim():"")||((state.rgName||"MY").slice(0,8).toUpperCase()+"-CRACK");
+  state.money-=5000;
+  var base=2+Math.floor(state.level/2);
+  state.customTablet={
+    name:name,quality:base+1,stability:base,appeal:base+2,
+    level:1,lifeDays:25+state.level*2,createdAt:Date.now()
+  };
+  // Update OPTIONS label
+  for(var i=0;i<OPTIONS.tablet.length;i++){
+    if(OPTIONS.tablet[i].id==="custom"){
+      OPTIONS.tablet[i].label=name;
+      OPTIONS.tablet[i].quality=state.customTablet.quality;
+      OPTIONS.tablet[i].stability=state.customTablet.stability;
+      OPTIONS.tablet[i].appeal=state.customTablet.appeal;
+    }
+  }
+  updateHeader();
+  toast("⚡ Таблетка «"+name+"» создана!","success");
+  addLog("Создана таблетка "+name,"success");
+  sndWin();vibSuccess();
+  renderTabletLab();
+  checkAchievements();
+  saveGame();
+}
+
+function upgradeCustomTablet(){
+  if(!state.customTablet)return;
+  var cost=3000+state.customTablet.level*1500;
+  if(state.money<cost){toast("Мало денег","danger");return;}
+  state.money-=cost;
+  state.customTablet.level++;
+  state.customTablet.quality+=2;
+  state.customTablet.stability+=1;
+  state.customTablet.appeal+=2;
+  state.customTablet.lifeDays+=5;
+  for(var i=0;i<OPTIONS.tablet.length;i++){
+    if(OPTIONS.tablet[i].id==="custom"){
+      OPTIONS.tablet[i].quality=state.customTablet.quality;
+      OPTIONS.tablet[i].stability=state.customTablet.stability;
+      OPTIONS.tablet[i].appeal=state.customTablet.appeal;
+      OPTIONS.tablet[i].label=state.customTablet.name;
+    }
+  }
+  updateHeader();
+  toast("Таблетка улучшена до ур. "+state.customTablet.level,"success");
+  addLog("Таблетка улучшена v"+state.customTablet.level,"success");
+  sndMoney();
+  renderTabletLab();
+  saveGame();
+}
+
+function renderDarkOps(){
+  var el=document.getElementById("darkops-content");
+  var h='<div class="panel"><div class="panel-h">💀 DDOS по конкурентам</div><div class="panel-b">'
+    +'<p style="font-size:12px;color:var(--muted);margin-bottom:12px">Атака временно роняет сайт соперника. Стоимость $800. Риск: −репутация при провале.</p>';
+  for(var i=0;i<(state.rivalSites||[]).length;i++){
+    var rs=state.rivalSites[i];
+    var down=rs.downUntil&&rs.downUntil>Date.now();
+    h+='<div class="shop-it">'
+      +'<div class="info"><div class="nm">'+esc(rs.name)+(down?' <span class="tag danger">OFFLINE</span>':'')+'</div>'
+      +'<div class="ds">'+esc(rs.owner)+' · HP '+rs.hp+'%</div></div>'
+      +'<button class="btn btn-sm btn-danger" data-action="ddos-rival" data-val="'+rs.id+'" '+(down?"disabled":"")+'>DDOS</button>'
+      +'</div>';
+  }
+  h+='</div></div>';
+  h+='<div class="card mt12" style="font-size:12px;color:var(--muted)">⚠️ Частые атаки повышают шанс ответного удара и жалоб.</div>';
+  el.innerHTML=h;
+}
+
+function ddosRival(id){
+  if(state.money<800){toast("Нужно $800","danger");return;}
+  if(state.level<3){toast("Нужен 3 уровень","warning");return;}
+  var rs=null;
+  for(var i=0;i<state.rivalSites.length;i++)if(state.rivalSites[i].id===id){rs=state.rivalSites[i];break;}
+  if(!rs||(rs.downUntil&&rs.downUntil>Date.now()))return;
+  state.money-=800;
+  var success=Math.random()<0.55+state.level*0.03;
+  if(success){
+    rs.hp=Math.max(0,rs.hp-40);
+    rs.downUntil=Date.now()+180000+Math.random()*300000;
+    toast("💥 "+rs.name+" лежит!","success");
+    addLog("DDOS успешен: "+rs.name,"success");
+    addFeed("⚠️ Сайт "+rs.name+" недоступен (атака?)");
+    sndWin();
+  } else {
+    state.rep=Math.max(0,state.rep-3);
+    toast("Атака провалена. −3 REP","danger");
+    addLog("DDOS провален: "+rs.name,"danger");
+    sndBad();
+  }
+  updateHeader();
+  renderDarkOps();
+  saveGame();
+}
+
+function renderFinance(){
+  var el=document.getElementById("finance-content");
+  var h='<div class="panel"><div class="panel-h">💳 Кредиты</div><div class="panel-b">';
+  if(state.loan){
+    h+='<div class="prev-row"><span class="k">Долг</span><span class="v danger">$'+fmt(Math.round(state.loan.amount))+'</span></div>'
+      +'<div class="prev-row"><span class="k">Процент</span><span class="v">'+state.loan.rate+'%/тик</span></div>'
+      +'<button class="btn btn-success btn-block mt8" data-action="repay-loan">Вернуть долг ($'+fmt(Math.round(state.loan.amount))+')</button>';
+  } else {
+    h+='<p style="font-size:12px;color:var(--muted);margin-bottom:10px">Быстрые деньги от «серых» контактов. Высокий процент.</p>'
+      +'<button class="btn btn-outline btn-block mb8" data-action="take-loan" data-val="2000">Взять $2 000 (8%)</button>'
+      +'<button class="btn btn-outline btn-block mb8" data-action="take-loan" data-val="5000">Взять $5 000 (12%)</button>'
+      +'<button class="btn btn-outline btn-block" data-action="take-loan" data-val="15000">Взять $15 000 (18%)</button>';
+  }
+  h+='</div></div>';
+  h+='<div class="panel"><div class="panel-h">📈 Инвестиции</div><div class="panel-b">'
+    +'<p style="font-size:12px;color:var(--muted);margin-bottom:10px">Вложи деньги. Через время вернётся с прибылью или убытком.</p>'
+    +'<button class="btn btn-outline btn-block mb8" data-action="invest" data-val="1000">Реклама ($1 000)</button>'
+    +'<button class="btn btn-outline btn-block mb8" data-action="invest" data-val="3000">Серверы ($3 000)</button>'
+    +'<button class="btn btn-outline btn-block" data-action="invest" data-val="8000">Серые контакты ($8 000)</button>';
+  if(state.investments&&state.investments.length){
+    h+='<div class="opt-group-h mt12">Активные</div>';
+    for(var i=0;i<state.investments.length;i++){
+      var inv=state.investments[i];
+      h+='<div class="list-item"><div class="left"><div class="name">$'+fmt(inv.amount)+'</div><div class="sub">осталось ~'+Math.max(0,Math.round((inv.readyAt-Date.now())/60000))+' мин</div></div></div>';
+    }
+  }
+  h+='</div></div>';
+  el.innerHTML=h;
+}
+
+function takeLoan(amount){
+  amount=parseInt(amount,10);
+  if(state.loan){toast("Уже есть долг","warning");return;}
+  var rate=amount<=2000?8:(amount<=5000?12:18);
+  state.money+=amount;
+  state.loan={amount:amount,rate:rate,takenAt:Date.now()};
+  updateHeader();
+  toast("💰 Получено $"+fmt(amount),"success");
+  addLog("Взят кредит $"+amount,"warning");
+  sndMoney();
+  renderFinance();
+  saveGame();
+}
+
+function repayLoan(){
+  if(!state.loan)return;
+  if(state.money<state.loan.amount){toast("Не хватает денег","danger");return;}
+  state.money-=state.loan.amount;
+  toast("Долг погашен","success");
+  addLog("Кредит погашен","success");
+  state.loan=null;
+  updateHeader();
+  renderFinance();
+  saveGame();
+}
+
+function doInvest(amount){
+  amount=parseInt(amount,10);
+  if(state.money<amount){toast("Мало денег","danger");return;}
+  state.money-=amount;
+  var readyAt=Date.now()+(3+Math.random()*5)*60000;
+  state.investments=state.investments||[];
+  state.investments.push({amount:amount,readyAt:readyAt,type:amount});
+  updateHeader();
+  toast("Инвестиция запущена","success");
+  addLog("Инвестиция $"+amount,"success");
+  renderFinance();
+  saveGame();
+}
+
+function replyToComment(id){
+  var c=null;
+  for(var i=0;i<state.comments.length;i++)if(state.comments[i].id===id){c=state.comments[i];break;}
+  if(!c||c.replied)return;
+  var replies=["Спасибо за отзыв!","Исправим в следующем патче.","Сиды будут, раздаём.","Принято, работаем."];
+  var reply=pick(replies);
+  c.replied=true;
+  c.replyText=reply;
+  state.rep=Math.min(100,state.rep+0.3);
+  toast("Ответ отправлен","success");
+  addLog("Ответ на комментарий","success");
+  renderComments();
+  saveGame();
+}
+
+function togglePublishTracker(id){
+  state.publishTrackers=state.publishTrackers||[];
+  var idx=state.publishTrackers.indexOf(id);
+  if(idx>=0)state.publishTrackers.splice(idx,1);
+  else{
+    if(state.publishTrackers.length>=3){toast("Макс. 3 трекера","warning");return;}
+    state.publishTrackers.push(id);
+  }
+  vibTap();
+  renderPublishSheet();
+}
+
+function togglePublishSite(){
+  state.publishToSite=!state.publishToSite;
+  vibTap();
+  renderPublishSheet();
+}
+
+function upgradeRepackVersion(id){
+  var rp=null;
+  for(var i=0;i<state.repacks.length;i++)if(state.repacks[i].id===id){rp=state.repacks[i];break;}
+  if(!rp||rp.status==="banned")return;
+  var cost=200+rp.patchVersion*100;
+  if(state.money<cost){toast("Нужно $"+cost,"danger");return;}
+  state.money-=cost;
+  rp.patchVersion=(rp.patchVersion||1)+1;
+  rp.quality=Math.min(100,rp.quality+3);
+  rp.stability=Math.min(100,rp.stability+2);
+  rp.seeds=Math.max(rp.seeds,15);
+  rp.publishedAt=Date.now();
+  rp.age=0;
+  rp.status="active";
+  rp.gamePatched=false;
+  state.rep=Math.min(100,state.rep+0.5);
+  updateHeader();
+  renderDists();
+  toast("Репак обновлён до v"+rp.patchVersion,"success");
+  addLog("v"+rp.patchVersion+" «"+rp.gameName+"»","success");
+  sndOk();
+  saveGame();
+}
+
+function updateHeader(){
+  document.getElementById("h-money").textContent=fmt(Math.round(state.money));
+  document.getElementById("h-rep").textContent=state.rep.toFixed(0);
+  document.getElementById("h-lvl").textContent=state.level;
+  document.getElementById("h-str").textContent=state.dmcaStrikes+"/3";
+  var brand=document.getElementById("h-brand");
+  if(brand&&state.rgName)brand.textContent=state.rgName.length>12?state.rgName.slice(0,12)+"…":state.rgName;
+}
+
+function checkLevel(){
+  var need=state.level*50;
+  if(state.xp>=need){
+    state.xp-=need;state.level++;
+    toast("🎖 Новый уровень: "+state.level,"success");
+    addLog("Новый уровень: "+state.level,"success");
+    sndWin();vibSuccess();
+  }
+}
+
+function getSaveData(){
+  return {
+    nick:state.nick,rgName:state.rgName,
+    money:state.money,rep:state.rep,level:state.level,xp:state.xp,
+    upgrades:state.upgrades,repacks:state.repacks,reviews:state.reviews,
+    comments:state.comments,feed:state.feed,eventLog:state.eventLog,
+    myGroup:state.myGroup,groupsVisited:state.groupsVisited,
+    dmcaStrikes:state.dmcaStrikes,banned:state.banned,
+    totalDownloads:state.totalDownloads,totalIncome:state.totalIncome,
+    lastTick:Date.now(),achievements:state.achievements,
+    questsDone:state.questsDone,currentQuests:state.currentQuests,
+    questDay:state.questDay,questProgress:state.questProgress,
+    denuvoWins:state.denuvoWins,trackerRep:state.trackerRep,
+    site:state.site,settings:state.settings,startedAt:state.startedAt,
+    customTablet:state.customTablet,rivalSites:state.rivalSites,
+    loan:state.loan,investments:state.investments
+  };
+}
+
+function applySaveData(d){
+  state.nick=d.nick||"";state.rgName=d.rgName||"";
+  state.money=Number(d.money)||500;state.rep=Number(d.rep)||15;
+  state.level=Number(d.level)||1;state.xp=Number(d.xp)||0;
+  state.upgrades=d.upgrades||[];state.repacks=d.repacks||[];
+  state.reviews=d.reviews||[];state.comments=d.comments||[];
+  state.feed=d.feed||[];state.eventLog=d.eventLog||[];
+  state.myGroup=d.myGroup||"solo";state.groupsVisited=d.groupsVisited||["solo"];
+  state.dmcaStrikes=Number(d.dmcaStrikes)||0;state.banned=!!d.banned;
+  state.totalDownloads=Number(d.totalDownloads)||0;
+  state.totalIncome=Number(d.totalIncome)||0;
+  state.lastTick=Number(d.lastTick)||Date.now();
+  state.achievements=d.achievements||[];
+  state.questsDone=Number(d.questsDone)||0;
+  state.currentQuests=d.currentQuests||[];
+  state.questDay=Number(d.questDay)||0;
+  state.questProgress=d.questProgress||{};
+  state.denuvoWins=Number(d.denuvoWins)||0;
+  state.trackerRep=d.trackerRep||{};
+  state.site=d.site||null;
+  state.settings=d.settings||{sound:true,vibrate:true};
+  state.startedAt=d.startedAt||Date.now();
+  state.customTablet=d.customTablet||null;
+  state.rivalSites=d.rivalSites||state.rivalSites;
+  state.loan=d.loan||null;
+  state.investments=d.investments||[];
+  if(state.customTablet){
+    for(var ct=0;ct<OPTIONS.tablet.length;ct++){
+      if(OPTIONS.tablet[ct].id==="custom"){
+        OPTIONS.tablet[ct].label=state.customTablet.name;
+        OPTIONS.tablet[ct].quality=state.customTablet.quality;
+        OPTIONS.tablet[ct].stability=state.customTablet.stability;
+        OPTIONS.tablet[ct].appeal=state.customTablet.appeal;
+      }
+    }
+  }
+  for(var i=0;i<state.repacks.length;i++){
+    var r=state.repacks[i];
+    if(!r.tracker){
+      for(var j=0;j<TRACKERS.length;j++)if(TRACKERS[j].id===r.trackerId){r.tracker=TRACKERS[j];break;}
+      if(r.trackerId==="site"&&state.site)r.tracker={id:"site",name:state.site.name,flag:"🌐",reqRu:false,minScreens:0,dmcaRisk:.2,audience:1.1,incomeMult:1.3,bonus:"Свой сайт"};
+    }
+  }
+}
+
+function saveGame(){
+  try{
+    localStorage.setItem("repackMasterMobile3",JSON.stringify(getSaveData()));
+  }catch(e){console.error(e);}
+}
+
+function loadGame(silent){
+  try{
+    var raw=localStorage.getItem("repackMasterMobile3")||localStorage.getItem("repackMasterMobile2");
+    if(!raw){if(!silent)toast("Нет сохранения","warning");return;}
+    var d=JSON.parse(raw);
+    applySaveData(d);
+    updateHeader();
+    if(!silent)toast("Загружено","success");
+  }catch(e){console.error(e);if(!silent)toast("Ошибка загрузки","danger");}
+}
+
+function exportSave(){
+  var data=JSON.stringify(getSaveData(),null,2);
+  var blob=new Blob([data],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;a.download="repack-master-save.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Сохранение экспортировано","success");
+}
+
+function resetGame(){
+  if(!confirm("Сбросить весь прогресс?"))return;
+  try{localStorage.removeItem("repackMasterMobile3");localStorage.removeItem("repackMasterMobile2");}catch(e){}
+  state=makeState();
+  document.getElementById("char-create").classList.remove("gone");
+  updateHeader();
+  toast("Прогресс сброшен","warning");
+}
+
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);
+else init();
+
+})();
+</script>
+</body>
+</html>
